@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cake-wallet-v6';
+const CACHE_NAME = 'cake-wallet-v7';
 const ASSETS = [
     './',
     './index.html',
