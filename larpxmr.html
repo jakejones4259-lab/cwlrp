@@ -482,7 +482,11 @@
 
         <header>
             <button class="icon-btn" style="margin-left: 4px;">
-                <img src="./icons/NotificationIcon.png" alt="Notification" style="width:20px;height:20px;">
+                <img src="./icons/NotificationIcon.png" alt="Notification" style="width:20px;height:20px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                <svg class="fallback-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px; display:none;">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
                 <div class="notification-dot"></div>
             </button>
             
@@ -492,7 +496,12 @@
             </div>
 
             <button class="icon-btn menu-btn">
-                <img src="./icons/MenuIcon.png" alt="Menu" style="width:20px;height:20px;">
+                <img src="./icons/MenuIcon.png" alt="Menu" style="width:20px;height:20px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                <svg class="fallback-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px; display:none;">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
             </button>
         </header>
 
@@ -545,23 +554,43 @@
 
         <nav class="bottom-bar">
             <div class="tab-item active">
-                <img src="./icons/WalletsIcon.png" alt="Wallets" style="width:22px;height:22px;">
+                <img src="./icons/WalletsIcon.png" alt="Wallets" style="width:22px;height:22px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                <svg class="fallback-icon" viewBox="0 0 24 24" style="display:none;">
+                    <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                    <line x1="2" y1="10" x2="22" y2="10"></line>
+                </svg>
                 Wallets
             </div>
             <div class="tab-item">
-                <img src="./icons/ReceiveIcon.png" alt="Receive" style="width:22px;height:22px;">
+                <img src="./icons/ReceiveIcon.png" alt="Receive" style="width:22px;height:22px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                <svg class="fallback-icon" viewBox="0 0 24 24" style="display:none;">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <polyline points="19 12 12 19 5 12"></polyline>
+                </svg>
                 Receive
             </div>
             <div class="tab-item">
-                <img src="./icons/SwapIcon.png" alt="Swap" style="width:22px;height:22px;">
+                <img src="./icons/SwapIcon.png" alt="Swap" style="width:22px;height:22px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                <svg class="fallback-icon" viewBox="0 0 24 24" style="display:none;" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M7 10h14l-4-4"></path>
+                    <path d="M17 14H3l4 4"></path>
+                </svg>
                 Swap
             </div>
             <div class="tab-item">
-                <img src="./icons/SendIcon.png" alt="Send" style="width:22px;height:22px;">
+                <img src="./icons/SendIcon.png" alt="Send" style="width:22px;height:22px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                <svg class="fallback-icon" viewBox="0 0 24 24" style="display:none;">
+                    <line x1="12" y1="19" x2="12" y2="5"></line>
+                    <polyline points="5 12 12 5 19 12"></polyline>
+                </svg>
                 Send
             </div>
             <div class="tab-item">
-                <img src="./icons/BuyIcon.png" alt="Buy" style="width:22px;height:22px;">
+                <img src="./icons/BuyIcon.png" alt="Buy" style="width:22px;height:22px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                <svg class="fallback-icon" viewBox="0 0 24 24" style="display:none;" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 1v22"></path>
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
                 Buy
             </div>
         </nav>
