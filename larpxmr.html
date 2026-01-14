@@ -266,35 +266,30 @@
             border-bottom: 1px solid var(--accent-green);
         }
 
-        .balance-fiat-container {
-            display: flex;
-            align-items: baseline;
-            gap: 10px;
-            margin-top: 0;
+        .balance-fiat-inline {
+            display: inline-block;
             color: var(--text-muted);
             font-size: 13px;
             font-weight: 500;
-        }
-
-        .balance-fiat-input {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            font-size: 13px;
-            font-weight: 500;
-            font-family: inherit;
-            width: auto;
-            min-width: 0;
+            font-family: 'Lato-Regular';
+            line-height: 1;
             padding: 0;
             margin: 0;
-            line-height: 1;
+            border: none;
+            background: transparent;
             -webkit-appearance: none;
+            -webkit-font-smoothing: antialiased;
+            white-space: nowrap;
+            letter-spacing: 0;
+            word-spacing: 0;
         }
-
-        .balance-fiat-input:focus {
-            outline: none;
+        .balance-fiat-inline[contenteditable="true"] {
             border-bottom: 1px solid var(--accent-green);
-            color: var(--text-main);
+        }
+        .balance-fiat-inline::before {
+            content: 'USD';
+            color: var(--text-muted);
+            margin-right: 4px;
         }
 
         .coin-info {
@@ -761,16 +756,7 @@
                                 style="${isEditMode ? 'border-bottom: 1px solid var(--accent-green);' : ''}"
                              >
                         </div>
-                        <div class="balance-fiat-container">
-                            <span>USD</span>
-                            <input type="text" 
-                                class="balance-fiat-input" 
-                                value="${wallet.fiat}" 
-                                oninput="handleFiatInput(this, ${index})"
-                                ${isEditMode ? '' : 'readonly'}
-                                style="${isEditMode ? 'border-bottom: 1px solid var(--accent-green);' : ''}"
-                            >
-                        </div>
+                        <div class="balance-fiat-inline" contenteditable="${isEditMode ? 'true' : 'false'}" oninput="handleFiatInlineInput(this, ${index})">${wallet.fiat}</div>
                     </div>
                     <div class="coin-info">
                         <img src="${coin.image}" class="coin-logo" alt="${coin.symbol}">
@@ -793,25 +779,23 @@
                     const fiatVal = formatFiat(numVal * price);
                     userWallets[index].fiat = fiatVal;
                     // Update the fiat input in real-time
-                    const fiatInput = input.closest('.balance-card').querySelector('.balance-fiat-input');
-                    if (fiatInput) fiatInput.value = fiatVal;
+                    const fiatInline = input.closest('.balance-card').querySelector('.balance-fiat-inline');
+                    if (fiatInline) fiatInline.textContent = fiatVal;
                 }
             }
         }
 
-        function handleFiatInput(input, index) {
-            const val = input.value;
+        function handleFiatInlineInput(el, index) {
+            const val = el.textContent;
             userWallets[index].fiat = val;
-            
             const coin = ALL_COINS.find(c => c.id === userWallets[index].id);
             if (coin && coinPrices[coin.coingeckoId]) {
                 const price = coinPrices[coin.coingeckoId].usd;
                 const numVal = parseFloat(val.replace(/,/g, ''));
                 if (!isNaN(numVal) && price > 0) {
-                    const balanceVal = (numVal / price).toFixed(6); // 6 decimals for crypto
+                    const balanceVal = (numVal / price).toFixed(6);
                     userWallets[index].balance = balanceVal;
-                    // Update the balance input in real-time
-                    const balanceInput = input.closest('.balance-card').querySelector('.balance-amount');
+                    const balanceInput = el.closest('.balance-card').querySelector('.balance-amount');
                     if (balanceInput) balanceInput.value = balanceVal;
                 }
             }
