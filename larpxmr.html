@@ -619,31 +619,38 @@
 
         // Data Configuration
         const ALL_COINS = [
-            { id: 'trx', coingeckoId: 'tron', name: 'Tron', symbol: 'TRX', image: 'icons/tron.webp' },
-            { id: 'usdt', coingeckoId: 'tether', name: 'Tether', symbol: 'USDT', image: 'icons/tether.webp' },
-            { id: 'btc', coingeckoId: 'bitcoin', name: 'Bitcoin', symbol: 'BTC', image: 'icons/bitcoin.webp' },
-            { id: 'eth', coingeckoId: 'ethereum', name: 'Ethereum', symbol: 'ETH', image: 'icons/ethereum.webp' },
-            { id: 'ltc', coingeckoId: 'litecoin', name: 'Litecoin', symbol: 'LTC', image: 'icons/litecoin.webp' },
-            { id: 'xmr', coingeckoId: 'monero', name: 'Monero', symbol: 'XMR', image: 'icons/monero.webp' },
-            { id: 'doge', coingeckoId: 'dogecoin', name: 'Dogecoin', symbol: 'DOGE', image: 'icons/dogecoin.webp' },
-            { id: 'bch', coingeckoId: 'bitcoin-cash', name: 'Bitcoin Cash', symbol: 'BCH', image: 'icons/bitcoin-cash.webp' },
-            { id: 'arb', coingeckoId: 'arbitrum', name: 'Arbitrum', symbol: 'ARB', image: 'icons/arbitrum.webp' },
-            { id: 'sol', coingeckoId: 'solana', name: 'Solana', symbol: 'SOL', image: 'icons/solana.webp' },
-            { id: 'usdc', coingeckoId: 'usd-coin', name: 'USDC', symbol: 'USDC', image: 'icons/usdc.webp' },
-            { id: 'matic', coingeckoId: 'matic-network', name: 'Polygon', symbol: 'MATIC', image: 'icons/polygon.webp' },
-            { id: 'dai', coingeckoId: 'dai', name: 'Dai', symbol: 'DAI', image: 'icons/dai.webp' },
-            { id: 'nano', coingeckoId: 'nano', name: 'Nano', symbol: 'XNO', image: 'icons/nano.webp' },
-            { id: 'wbtc', coingeckoId: 'wrapped-bitcoin', name: 'Wrapped BTC', symbol: 'WBTC', image: 'icons/wbtc.webp' },
-            { id: 'zano', coingeckoId: 'zano', name: 'Zano', symbol: 'ZANO', image: 'icons/zano.webp' },
-            { id: 'wow', coingeckoId: 'wownero', name: 'Wownero', symbol: 'WOW', image: 'icons/wownero.webp' },
-            { id: 'base', coingeckoId: 'ethereum', name: 'Base', symbol: 'ETH', image: 'icons/base_icon.webp' },
-            { id: 'dcr', coingeckoId: 'decred', name: 'Decred', symbol: 'DCR', image: 'icons/decred.webp' },
-            { id: 'deuro', coingeckoId: 'agau-deuro', name: 'DEuro', symbol: 'DEURO', image: 'icons/deuro.webp' },
-            { id: 'usde', coingeckoId: 'ethena-usde', name: 'Ethena USDe', symbol: 'USDe', image: 'icons/ethena-usde-logo.png' }
+            { id: 'trx', coingeckoId: 'tron', name: 'Tron', symbol: 'TRX', image: './icons/tron.webp' },
+            { id: 'usdt', coingeckoId: 'tether', name: 'Tether', symbol: 'USDT', image: './icons/tether.webp' },
+            { id: 'btc', coingeckoId: 'bitcoin', name: 'Bitcoin', symbol: 'BTC', image: './icons/bitcoin.webp' },
+            { id: 'eth', coingeckoId: 'ethereum', name: 'Ethereum', symbol: 'ETH', image: './icons/ethereum.webp' },
+            { id: 'ltc', coingeckoId: 'litecoin', name: 'Litecoin', symbol: 'LTC', image: './icons/litecoin.webp' },
+            { id: 'xmr', coingeckoId: 'monero', name: 'Monero', symbol: 'XMR', image: './icons/monero.webp' },
+            { id: 'doge', coingeckoId: 'dogecoin', name: 'Dogecoin', symbol: 'DOGE', image: './icons/dogecoin.webp' },
+            { id: 'bch', coingeckoId: 'bitcoin-cash', name: 'Bitcoin Cash', symbol: 'BCH', image: './icons/bitcoin-cash.webp' },
+            { id: 'arb', coingeckoId: 'arbitrum', name: 'Arbitrum', symbol: 'ARB', image: './icons/arbitrum.webp' },
+            { id: 'sol', coingeckoId: 'solana', name: 'Solana', symbol: 'SOL', image: './icons/solana.webp' },
+            { id: 'usdc', coingeckoId: 'usd-coin', name: 'USDC', symbol: 'USDC', image: './icons/usdc.webp' },
+            { id: 'matic', coingeckoId: 'matic-network', name: 'Polygon', symbol: 'MATIC', image: './icons/polygon.webp' },
+            { id: 'dai', coingeckoId: 'dai', name: 'Dai', symbol: 'DAI', image: './icons/dai.webp' },
+            { id: 'nano', coingeckoId: 'nano', name: 'Nano', symbol: 'XNO', image: './icons/nano.webp' },
+            { id: 'wbtc', coingeckoId: 'wrapped-bitcoin', name: 'Wrapped BTC', symbol: 'WBTC', image: './icons/wbtc.webp' },
+            { id: 'zano', coingeckoId: 'zano', name: 'Zano', symbol: 'ZANO', image: './icons/zano.webp' },
+            { id: 'wow', coingeckoId: 'wownero', name: 'Wownero', symbol: 'WOW', image: './icons/wownero.webp' },
+            { id: 'base', coingeckoId: 'ethereum', name: 'Base', symbol: 'ETH', image: './icons/base_icon.webp' },
+            { id: 'dcr', coingeckoId: 'decred', name: 'Decred', symbol: 'DCR', image: './icons/decred.webp' },
+            { id: 'deuro', coingeckoId: 'agau-deuro', name: 'DEuro', symbol: 'DEURO', image: './icons/deuro.webp' },
+            { id: 'usde', coingeckoId: 'ethena-usde', name: 'Ethena USDe', symbol: 'USDe', image: './icons/ethena-usde-logo.png' }
         ];
 
         // Coin Prices Cache
-        let coinPrices = {};
+        let coinPrices = {
+            'monero': { usd: 644.00 }, // Default fallback
+            'bitcoin': { usd: 95000.00 },
+            'ethereum': { usd: 3500.00 },
+            'litecoin': { usd: 85.00 },
+            'tron': { usd: 0.15 },
+            'tether': { usd: 1.00 }
+        };
 
         // Initial State
         let userWallets = [
@@ -693,6 +700,9 @@
                 if (!coinPrices['monero']) {
                     coinPrices['monero'] = { usd: 644.00 }; // Approximate fallback
                 }
+                // Ensure other keys exist if missing
+                if (!coinPrices['bitcoin']) coinPrices['bitcoin'] = { usd: 95000.00 };
+                
                 updateAllFiats();
             }
         }
