@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0d1221">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Cake Wallet">
+    <link rel="icon" type="image/png" href="apple-touch-icon.png" sizes="180x180">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" sizes="180x180">
+    <!-- PWA Manifest and Service Worker -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Cake Wallet</title>
+    <style>
+        @font-face {
+            font-family: 'Lato-Light';
+            src: url('Lato-Light.ttf') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Lato-Regular';
+            src: url('Lato-Regular.ttf') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Lato-Bold';
+            src: url('Lato-Bold.ttf') format('truetype');
+            font-weight: 700;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Lato-Heavy';
+            src: url('Lato-Heavy.ttf') format('truetype');
+            font-weight: 700;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Lato-Black';
+            src: url('Lato-Black.ttf') format('truetype');
+            font-weight: 700;
+            font-style: normal;
+        }
+
+        :root {
+            /* User specified base color, refined for accuracy */
+            --bg-color: #14203F; 
+            --card-bg: #1F2A40; /* Slightly lighter/bluer to match screenshot */
+            --text-main: #D9E1F6;
+            --text-muted: #8e9ab0;
+            --text-amount: #D9E1F6;
+            --accent-green: #27d983;
+            --accent-red: #ff3b30;
+            --nav-pill-bg: #252F46;
+            --bottom-bar-bg: #24335B;
+            --font-family: 'Lato-Regular', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000000;
+            color: var(--text-main);
+            font-family: var(--font-family);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 440px;
+            height: 100%;
+            background-color: var(--bg-color);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2); /* Subtle shadow */
+        }
+
+        .status-bar-spacer {
+            height: env(safe-area-inset-top, 20px);
+            width: 100%;
+            background-color: var(--bg-color);
+            flex-shrink: 0;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            height: 54px; /* Slightly shorter */
+            flex-shrink: 0;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .icon-btn svg {
+            width: 24px;
+            height: 24px;
+            stroke: #dbeafe; /* Blue tinted */
+            stroke-width: 2;
+        }
+
+        /* Notification Dot */
+        .notification-dot {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 8px;
+            height: 8px;
+            background-color: #3b82f6; /* Blue dot */
+            border-radius: 50%;
+            border: 1.5px solid var(--bg-color);
+        }
+
+        .sync-badge {
+            background-color: #24335B;
+            color: #aeb8c9;
+            padding: 8px 71px; /* Wider */
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+        }
+
+        .sync-dot {
+            width: 5px;
+            height: 5px;
+            background-color: var(--accent-green);
+            border-radius: 50%;
+        }
+
+        .content {
+            flex: 1;
+            padding: 0 16px;
+            overflow-y: auto;
+            padding-bottom: 140px;
+            scrollbar-width: none;
+        }
+        .content::-webkit-scrollbar {
+            display: none;
+        }
+
+        .wallet-header {
+            margin-top: 16px;
+            margin-bottom: 50px;
+            gap: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-left: 4px;
+        }
+
+        .wallet-title-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .wallet-title {
+            font-size: 20px; /* Smaller as requested */
+            font-weight: 500;
+            padding-bottom: 12px;
+            color: var(--text-main);
+        }
+
+        .wallet-icon-small {
+            opacity: 0.5;
+            width: 18px;
+            height: 18px;
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Cards */
+        .balance-card {
+            background: linear-gradient(180deg, #2A3965 0%, #1D2B51 100%);
+            border: 1px solid #3E5481;
+            border-radius: 20px; /* Slightly less rounded */
+            padding: 16px 20px;
+            margin-bottom: 12px; /* Closer together */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            height: 100px; /* Shorter height */
+            position: relative;
+        }
+
+        .balance-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            flex: 1;
+        }
+
+        .balance-label {
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 1px;
+            letter-spacing: 0.3px;
+            font-family: 'Lato-Light';
+        }
+
+        .balance-row {
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+        }
+
+        .balance-amount {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: var(--text-amount);
+            background: transparent;
+            border: none;
+            padding: 0;
+            margin: 0;
+            width: auto;
+            min-width: 20px;
+            font-family: 'Lato-Black';
+        }
+
+        .balance-amount:focus {
+            outline: none;
+            border-bottom: 1px solid var(--accent-green);
+        }
+
+        .balance-fiat-container {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            margin-top: -1px;
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .balance-fiat-input {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 500;
+            font-family: inherit;
+            width: 120px;
+        }
+
+        .balance-fiat-input:focus {
+            outline: none;
+            border-bottom: 1px solid var(--accent-green);
+            color: var(--text-main);
+        }
+
+        .coin-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+        }
+
+        .coin-logo {
+            width: 39px; /* Smaller */
+            position: absolute;
+            bottom: 40px;
+            height: 39px;
+            border-radius: 50%;
+            margin-bottom: 4px;
+            object-fit: contain;
+        }
+
+        .coin-symbol {
+            color: var(--text-main);
+            position: absolute;
+            top: 65px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        /* Floating Nav */
+        .floating-nav-container {
+            position: absolute;
+            bottom: 140px; /* Slightly lower */
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .floating-nav {
+            background-color: #192648;
+            border-radius: 30px;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            pointer-events: auto;
+            border: 1px solid rgba(255,255,255,0.03);
+            transform: scale(0.9);
+        }
+
+        .nav-pill-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-pill-item.active {
+            background-color: #2F3B55;
+            color: var(--text-main);
+        }
+
+        .nav-pill-item svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+
+        /* Bottom Bar */
+        .bottom-bar {
+            position: absolute;
+            bottom: 50px; /* Moved up */
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 32px); /* Smaller width with margins */
+            max-width: 400px;
+            background-color: var(--bottom-bar-bg);
+            padding: 14px 14px; /* Uniform padding */
+            display: flex;
+            justify-content: space-around;
+            border-radius: 40px; /* Fully rounded/circular rectangle */
+            z-index: 20;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-muted);
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 60px;
+            transition: color 0.2s;
+        }
+
+        .tab-item:hover {
+            color: #aeb8c9;
+        }
+
+        .tab-item svg {
+            width: 22px;
+            height: 22px;
+            stroke: #dbeafe; /* Blue tinted */
+            stroke-width: 1.8;
+            fill: none;
+            transition: stroke 0.2s;
+        }
+
+        .tab-item.active {
+            color: var(--text-main);
+        }
+        
+        .tab-item.active svg {
+            stroke: var(--text-main);
+        }
+        
+        /* Modal & Add Coin Styles */
+        .modal-overlay {
+            position: absolute; /* Changed from fixed to absolute to stay in container */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            width: 90%;
+            max-width: 360px;
+            max-height: 70vh;
+            border-radius: 24px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .coin-list {
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .coin-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer;
+        }
+
+        .coin-item img {
+            width: 28px;
+            height: 28px;
+            margin-right: 12px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        <div class="status-bar-spacer"></div>
+
+        <header>
+            <button class="icon-btn" style="margin-left: 4px;"> <!-- Moved slightly right -->
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;"> <!-- Shrunk -->
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+                <div class="notification-dot"></div>
+            </button>
+            
+            <div class="sync-badge">
+                <div class="sync-dot"></div>
+                SYNCHRONIZED
+            </div>
+
+            <button class="icon-btn menu-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+        </header>
+
+        <div class="content">
+            <div class="wallet-header" style="flex-direction: column; align-items: center; justify-content: center; margin-bottom: 50px;">
+                <div id="wallet-name-container" style="margin-bottom: 4px; cursor: pointer;">
+                    <span id="wallet-name-display" style="font-size: 24px; color: white; font-weight: 500;">d</span>
+                    <input id="wallet-name-input" type="text" value="d" style="display: none; font-size: 24px; color: white; background: transparent; border: none; border-bottom: 1px solid var(--accent-green); text-align: center; width: 100px; outline: none;">
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 6px; color: #91B0FF;">
+                    <span style="font-size: 14px; font-weight: 600;">Primary account</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 23px; height: 23px;">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+            </div>
+
+            <div id="wallets-container">
+                <!-- Wallet cards will be injected here -->
+            </div>
+        </div>
+
+        <div class="floating-nav-container">
+            <div class="floating-nav">
+                <div class="nav-pill-item">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    Apps
+                </div>
+                <div class="nav-pill-item active">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    </svg>
+                    Home
+                </div>
+                <div class="nav-pill-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    History
+                </div>
+            </div>
+        </div>
+
+        <nav class="bottom-bar">
+            <div class="tab-item active">
+                <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
+                    <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                    <line x1="2" y1="10" x2="22" y2="10"></line>
+                </svg>
+                Wallets
+            </div>
+            <div class="tab-item">
+                <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <polyline points="19 12 12 19 5 12"></polyline>
+                </svg>
+                Receive
+            </div>
+            <div class="tab-item">
+                <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M7 10h14l-4-4"/>
+                    <path d="M17 14H3l4 4"/>
+                </svg>
+                Swap
+            </div>
+            <div class="tab-item">
+                <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 1v22"/>
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                </svg>
+                Buy
+            </div>
+            <div class="tab-item">
+                <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
+                    <line x1="12" y1="19" x2="12" y2="5"></line>
+                    <polyline points="5 12 12 5 19 12"></polyline>
+                </svg>
+                Send
+            </div>
+        </nav>
+
+        <!-- Add Coin Modal -->
+        <div class="modal-overlay" id="add-coin-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">Add Coin</div>
+                    <button class="close-modal" id="close-modal">&times;</button>
+                </div>
+                <div class="coin-list" id="coin-list-container">
+                    <!-- Coin items will be injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Options Menu (Hidden by default) -->
+        <div id="options-menu" style="display: none; position: absolute; top: 80px; right: 20px; background: #252F46; padding: 8px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); z-index: 50; min-width: 140px;">
+            <div id="menu-edit-btn" style="padding: 10px 16px; color: white; font-size: 14px; cursor: pointer; border-radius: 8px;">Edit Wallets</div>
+            <div onclick="window.location.href='index.html'" style="padding: 10px 16px; color: white; font-size: 14px; cursor: pointer; border-radius: 8px;">Larp Normally</div>
+        </div>
+    </div>
+
+    <script>
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+
+        // Data Configuration
+        const ALL_COINS = [
+            { id: 'trx', coingeckoId: 'tron', name: 'Tron', symbol: 'TRX', image: 'icons/tron.webp' },
+            { id: 'usdt', coingeckoId: 'tether', name: 'Tether', symbol: 'USDT', image: 'icons/tether.webp' },
+            { id: 'btc', coingeckoId: 'bitcoin', name: 'Bitcoin', symbol: 'BTC', image: 'icons/bitcoin.webp' },
+            { id: 'eth', coingeckoId: 'ethereum', name: 'Ethereum', symbol: 'ETH', image: 'icons/ethereum.webp' },
+            { id: 'ltc', coingeckoId: 'litecoin', name: 'Litecoin', symbol: 'LTC', image: 'icons/litecoin.webp' },
+            { id: 'xmr', coingeckoId: 'monero', name: 'Monero', symbol: 'XMR', image: 'icons/monero.webp' },
+            { id: 'doge', coingeckoId: 'dogecoin', name: 'Dogecoin', symbol: 'DOGE', image: 'icons/dogecoin.webp' },
+            { id: 'bch', coingeckoId: 'bitcoin-cash', name: 'Bitcoin Cash', symbol: 'BCH', image: 'icons/bitcoin-cash.webp' },
+            { id: 'arb', coingeckoId: 'arbitrum', name: 'Arbitrum', symbol: 'ARB', image: 'icons/arbitrum.webp' },
+            { id: 'sol', coingeckoId: 'solana', name: 'Solana', symbol: 'SOL', image: 'icons/solana.webp' },
+            { id: 'usdc', coingeckoId: 'usd-coin', name: 'USDC', symbol: 'USDC', image: 'icons/usdc.webp' },
+            { id: 'matic', coingeckoId: 'matic-network', name: 'Polygon', symbol: 'MATIC', image: 'icons/polygon.webp' },
+            { id: 'dai', coingeckoId: 'dai', name: 'Dai', symbol: 'DAI', image: 'icons/dai.webp' },
+            { id: 'nano', coingeckoId: 'nano', name: 'Nano', symbol: 'XNO', image: 'icons/nano.webp' },
+            { id: 'wbtc', coingeckoId: 'wrapped-bitcoin', name: 'Wrapped BTC', symbol: 'WBTC', image: 'icons/wbtc.webp' },
+            { id: 'zano', coingeckoId: 'zano', name: 'Zano', symbol: 'ZANO', image: 'icons/zano.webp' },
+            { id: 'wow', coingeckoId: 'wownero', name: 'Wownero', symbol: 'WOW', image: 'icons/wownero.webp' },
+            { id: 'base', coingeckoId: 'ethereum', name: 'Base', symbol: 'ETH', image: 'icons/base_icon.webp' },
+            { id: 'dcr', coingeckoId: 'decred', name: 'Decred', symbol: 'DCR', image: 'icons/decred.webp' },
+            { id: 'deuro', coingeckoId: 'agau-deuro', name: 'DEuro', symbol: 'DEURO', image: 'icons/deuro.webp' },
+            { id: 'usde', coingeckoId: 'ethena-usde', name: 'Ethena USDe', symbol: 'USDe', image: 'icons/ethena-usde-logo.png' }
+        ];
+
+        // Coin Prices Cache
+        let coinPrices = {};
+
+        // Initial State
+        let userWallets = [
+            { id: 'xmr', balance: '0.000000', fiat: '0.00' }
+        ];
+
+        let isEditMode = false;
+
+        // DOM Elements
+        const walletsContainer = document.getElementById('wallets-container');
+        // const editBtn = document.getElementById('edit-mode-btn'); // Removed visible button
+        const menuDotsBtn = document.querySelector('.menu-btn'); // 3 dots
+        const optionsMenu = document.getElementById('options-menu');
+        const menuEditBtn = document.getElementById('menu-edit-btn');
+        const menuAddBtn = document.getElementById('menu-add-btn');
+        
+        const addCoinModal = document.getElementById('add-coin-modal');
+        const closeModalBtn = document.getElementById('close-modal');
+        const coinListContainer = document.getElementById('coin-list-container');
+
+        // Functions
+        function formatFiat(num) {
+            return num.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+
+        async function fetchPrices() {
+            try {
+                // Only fetch prices for active wallets
+                const ids = userWallets.map(w => {
+                    const coin = ALL_COINS.find(c => c.id === w.id);
+                    return coin ? coin.coingeckoId : '';
+                }).filter(id => id).join(',');
+
+                if (!ids) return;
+
+                const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`);
+                if (!response.ok) throw new Error('Network response was not ok');
+                const data = await response.json();
+                
+                // Merge new prices into existing coinPrices
+                coinPrices = { ...coinPrices, ...data };
+                console.log('Prices fetched:', coinPrices);
+                updateAllFiats();
+            } catch (error) {
+                console.error('Error fetching prices:', error);
+                // Fallback for XMR if fetch fails
+                if (!coinPrices['monero']) {
+                    coinPrices['monero'] = { usd: 644.00 }; // Approximate fallback
+                }
+                updateAllFiats();
+            }
+        }
+
+        function updateAllFiats() {
+            userWallets.forEach(wallet => {
+                const coin = ALL_COINS.find(c => c.id === wallet.id);
+                if (coin && coinPrices[coin.coingeckoId]) {
+                    const price = coinPrices[coin.coingeckoId].usd;
+                    const balance = parseFloat(wallet.balance.replace(/,/g, '')) || 0;
+                    wallet.fiat = formatFiat(balance * price);
+                }
+            });
+            renderWallets();
+        }
+
+        function renderWallets() {
+            walletsContainer.innerHTML = '';
+            
+            userWallets.forEach((wallet, index) => {
+                const coin = ALL_COINS.find(c => c.id === wallet.id);
+                if (!coin) return;
+
+                const card = document.createElement('div');
+                card.className = 'balance-card';
+                
+                // Only show remove button if in edit mode
+                let removeBtnHtml = '';
+                if (isEditMode) {
+                    removeBtnHtml = `<div class="remove-btn" onclick="removeWallet(event, ${index})">&times;</div>`;
+                    card.style.border = '1px dashed rgba(255,255,255,0.2)';
+                }
+
+                card.innerHTML = `
+                    ${removeBtnHtml}
+                    <div class="balance-info">
+                        <div class="balance-label">Available Balance</div>
+                        <div class="balance-row">
+                             <input type="text" 
+                                class="balance-amount" 
+                                value="${wallet.balance}" 
+                                oninput="handleBalanceInput(this, ${index})"
+                                ${isEditMode ? '' : 'readonly'}
+                                style="${isEditMode ? 'border-bottom: 1px solid var(--accent-green);' : ''}"
+                             >
+                        </div>
+                        <div class="balance-fiat-container">
+                            <span>USD</span>
+                            <input type="text" 
+                                class="balance-fiat-input" 
+                                value="${wallet.fiat}" 
+                                oninput="handleFiatInput(this, ${index})"
+                                ${isEditMode ? '' : 'readonly'}
+                                style="${isEditMode ? 'border-bottom: 1px solid var(--accent-green);' : ''}"
+                            >
+                        </div>
+                    </div>
+                    <div class="coin-info">
+                        <img src="${coin.image}" class="coin-logo" alt="${coin.symbol}">
+                        <div class="coin-symbol">${coin.symbol}</div>
+                    </div>
+                `;
+                walletsContainer.appendChild(card);
+            });
+        }
+
+        function handleBalanceInput(input, index) {
+            const val = input.value;
+            userWallets[index].balance = val;
+            
+            const coin = ALL_COINS.find(c => c.id === userWallets[index].id);
+            if (coin && coinPrices[coin.coingeckoId]) {
+                const price = coinPrices[coin.coingeckoId].usd;
+                const numVal = parseFloat(val.replace(/,/g, ''));
+                if (!isNaN(numVal)) {
+                    const fiatVal = formatFiat(numVal * price);
+                    userWallets[index].fiat = fiatVal;
+                    // Update the fiat input in real-time
+                    const fiatInput = input.closest('.balance-card').querySelector('.balance-fiat-input');
+                    if (fiatInput) fiatInput.value = fiatVal;
+                }
+            }
+        }
+
+        function handleFiatInput(input, index) {
+            const val = input.value;
+            userWallets[index].fiat = val;
+            
+            const coin = ALL_COINS.find(c => c.id === userWallets[index].id);
+            if (coin && coinPrices[coin.coingeckoId]) {
+                const price = coinPrices[coin.coingeckoId].usd;
+                const numVal = parseFloat(val.replace(/,/g, ''));
+                if (!isNaN(numVal) && price > 0) {
+                    const balanceVal = (numVal / price).toFixed(6); // 6 decimals for crypto
+                    userWallets[index].balance = balanceVal;
+                    // Update the balance input in real-time
+                    const balanceInput = input.closest('.balance-card').querySelector('.balance-amount');
+                    if (balanceInput) balanceInput.value = balanceVal;
+                }
+            }
+        }
+
+        function removeWallet(e, index) {
+            e.stopPropagation(); // Prevent bubbling
+            if (confirm('Are you sure you want to remove this coin?')) {
+                userWallets.splice(index, 1);
+                renderWallets();
+            }
+        }
+
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            menuEditBtn.innerText = isEditMode ? 'Done Editing' : 'Edit Wallets';
+            renderWallets();
+            optionsMenu.style.display = 'none';
+        }
+
+        function openAddCoinModal() {
+            // Filter coins not already in wallet
+            const currentIds = userWallets.map(w => w.id);
+            const available = ALL_COINS.filter(c => !currentIds.includes(c.id));
+
+            coinListContainer.innerHTML = '';
+            available.forEach(coin => {
+                const item = document.createElement('div');
+                item.className = 'coin-item';
+                item.innerHTML = `
+                    <img src="${coin.image}" alt="${coin.symbol}">
+                    <span class="coin-item-name">${coin.name} (${coin.symbol})</span>
+                `;
+                item.onclick = () => addCoin(coin.id);
+                coinListContainer.appendChild(item);
+            });
+
+            addCoinModal.style.display = 'flex';
+            optionsMenu.style.display = 'none';
+        }
+
+        function addCoin(coinId) {
+            const coin = ALL_COINS.find(c => c.id === coinId);
+            let fiatVal = '0.00';
+            if (coin && coinPrices[coin.coingeckoId]) {
+                // If we have price, 0 balance is 0 fiat
+            }
+            
+            userWallets.push({
+                id: coinId,
+                balance: '0.000000',
+                fiat: fiatVal
+            });
+            renderWallets();
+            addCoinModal.style.display = 'none';
+        }
+
+        // Event Listeners
+        menuDotsBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            optionsMenu.style.display = optionsMenu.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // Hide menu when clicking outside
+        document.addEventListener('click', () => {
+            optionsMenu.style.display = 'none';
+        });
+        
+        // Menu Items
+        menuEditBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleEditMode();
+        });
+
+        if (menuAddBtn) {
+            menuAddBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openAddCoinModal();
+            });
+        }
+
+        closeModalBtn.addEventListener('click', () => {
+            addCoinModal.style.display = 'none';
+        });
+
+        // Close modal when clicking outside
+        addCoinModal.addEventListener('click', (e) => {
+            if (e.target === addCoinModal) {
+                addCoinModal.style.display = 'none';
+            }
+        });
+
+        // Wallet Name Renaming Logic
+        const walletNameContainer = document.getElementById('wallet-name-container');
+        const walletNameDisplay = document.getElementById('wallet-name-display');
+        const walletNameInput = document.getElementById('wallet-name-input');
+
+        if (walletNameContainer && walletNameInput) {
+            walletNameContainer.addEventListener('click', () => {
+                walletNameDisplay.style.display = 'none';
+                walletNameInput.style.display = 'block';
+                walletNameInput.focus();
+            });
+
+            walletNameInput.addEventListener('blur', () => {
+                walletNameDisplay.innerText = walletNameInput.value;
+                walletNameDisplay.style.display = 'block';
+                walletNameInput.style.display = 'none';
+            });
+
+            walletNameInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    walletNameInput.blur();
+                }
+            });
+        }
+
+        // Initial Render
+        renderWallets();
+        fetchPrices();
+        setInterval(fetchPrices, 60000); // Update prices every minute
+
+        // Navigation Interactions
+        document.querySelectorAll('.nav-pill-item, .tab-item').forEach(item => {
+            item.addEventListener('click', function() {
+                this.parentElement.querySelectorAll('.active').forEach(el => el.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+    </script>
+</body>
+</html>
