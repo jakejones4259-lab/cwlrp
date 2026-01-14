@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cake-wallet-v7';
+const CACHE_NAME = 'cake-wallet-v8';
 const ASSETS = [
     './',
     './index.html',
@@ -17,6 +17,7 @@ self.addEventListener('install', (event) => {
                 return cache.addAll(ASSETS);
             })
     );
+    self.skipWaiting();
 });
 
 // Fetch event
@@ -64,4 +65,5 @@ self.addEventListener('activate', (event) => {
             );
         })
     );
+    clients.claim();
 });
