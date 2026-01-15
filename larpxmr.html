@@ -172,7 +172,7 @@
 
         .wallet-header {
             margin-top: 16px;
-            margin-bottom: 50px;
+            margin-bottom: 20px;
             gap: 10px;
             display: flex;
             align-items: center;
@@ -213,7 +213,7 @@
         /* Cards */
         .balance-card {
             background: linear-gradient(180deg, #2A3965 0%, #1D2B51 100%);
-            border: 1px solid #3E5481;
+            border: 1px solid #2A3E73;
             border-radius: 20px; /* Slightly less rounded */
             padding: 16px 20px;
             margin-bottom: 12px; /* Closer together */
@@ -333,7 +333,7 @@
         .floating-nav {
             background-color: #192648;
             border-radius: 30px;
-            padding: 5px;
+            padding: 7px;
             display: flex;
             align-items: center;
             pointer-events: auto;
@@ -501,15 +501,15 @@
         </header>
 
         <div class="content">
-            <div class="wallet-header" style="flex-direction: column; align-items: center; justify-content: center; margin-bottom: 50px;">
+            <div class="wallet-header" style="flex-direction: column; align-items: center; justify-content: center; margin-bottom: 30px;">
                 <div id="wallet-name-container" style="margin-bottom: 4px; cursor: pointer;">
-                    <span id="wallet-name-display" style="font-size: 24px; color: white; font-weight: 500;">d</span>
+                    <span id="wallet-name-display" style="font-size: 24px; color: white; font-weight: 500;font-family: 'Lato-Bold';">d</span>
                     <input id="wallet-name-input" type="text" value="d" style="display: none; font-size: 24px; color: white; background: transparent; border: none; border-bottom: 1px solid var(--accent-green); text-align: center; width: 100px; outline: none;">
                 </div>
                 
                 <div style="display: flex; align-items: center; gap: 6px; color: #91B0FF;">
-                    <span style="font-size: 14px; font-weight: 600;">Primary account</span>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 23px; height: 23px;">
+                    <span style="font-size: 13px; font-weight: 600;">Primary account</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
                         <polyline points="6 9 12 15 18 9"></polyline>
                     </svg>
                 </div>
@@ -549,7 +549,7 @@
 
         <nav class="bottom-bar">
             <div class="tab-item active">
-                <img src="./icons/WalletsIcon.png" alt="Wallets" style="width:22px;height:22px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                <img src="./icons/WalletsIcon.png" alt="Wallets" style="width:30px;height:30px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
                 <svg class="fallback-icon" viewBox="0 0 24 24" style="display:none;">
                     <rect x="2" y="4" width="20" height="16" rx="2"></rect>
                     <line x1="2" y1="10" x2="22" y2="10"></line>
@@ -557,7 +557,7 @@
                 Wallets
             </div>
             <div class="tab-item">
-                <img src="./icons/ReceiveIcon.png" alt="Receive" style="width:22px;height:22px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                <img src="./icons/ReceiveIcon.png" alt="Receive" style="width:30px;height:30px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
                 <svg class="fallback-icon" viewBox="0 0 24 24" style="display:none;">
                     <line x1="12" y1="5" x2="12" y2="19"></line>
                     <polyline points="19 12 12 19 5 12"></polyline>
@@ -565,7 +565,7 @@
                 Receive
             </div>
             <div class="tab-item">
-                <img src="./icons/SwapIcon.png" alt="Swap" style="width:22px;height:22px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                <img src="./icons/SwapIcon.png" alt="Swap" style="width:30px;height:30px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
                 <svg class="fallback-icon" viewBox="0 0 24 24" style="display:none;" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M7 10h14l-4-4"></path>
                     <path d="M17 14H3l4 4"></path>
@@ -573,7 +573,7 @@
                 Swap
             </div>
             <div class="tab-item">
-                <img src="./icons/SendIcon.png" alt="Send" style="width:22px;height:22px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                <img src="./icons/SendIcon.png" alt="Send" style="width:30px;height:30px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
                 <svg class="fallback-icon" viewBox="0 0 24 24" style="display:none;">
                     <line x1="12" y1="19" x2="12" y2="5"></line>
                     <polyline points="5 12 12 5 19 12"></polyline>
@@ -581,7 +581,7 @@
                 Send
             </div>
             <div class="tab-item">
-                <img src="./icons/BuyIcon.png" alt="Buy" style="width:22px;height:22px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                <img src="./icons/BuyIcon.png" alt="Buy" style="width:30px;height:30px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
                 <svg class="fallback-icon" viewBox="0 0 24 24" style="display:none;" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 1v22"></path>
                     <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
