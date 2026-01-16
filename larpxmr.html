@@ -165,9 +165,21 @@
             overflow-y: auto;
             padding-bottom: 140px;
             scrollbar-width: none;
+            position: relative;
         }
         .content::-webkit-scrollbar {
             display: none;
+        }
+        #app-container::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 220px;
+            pointer-events: none;
+            z-index: 3;
+            background: linear-gradient(to bottom, rgba(20,32,63,0) 0%, rgba(20,32,63,0.5) 40%, rgba(20,32,63,0.95) 100%);
         }
 
         .wallet-header {
@@ -337,7 +349,6 @@
             display: flex;
             align-items: center;
             pointer-events: auto;
-            border: 1px solid rgba(255,255,255,0.03);
             transform: scale(0.9);
         }
 
@@ -347,22 +358,27 @@
             gap: 6px;
             padding: 6px 14px;
             border-radius: 20px;
-            color: var(--text-muted);
-            font-size: 11px;
+            color: #96AFEF;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
         }
 
         .nav-pill-item.active {
-            background-color: #2F3B55;
+            background-color: #324060;
             color: var(--text-main);
         }
 
         .nav-pill-item svg {
-            width: 14px;
-            height: 14px;
+            width: 20px;
+            height: 20px;
             fill: currentColor;
+        }
+        .nav-pill-item img {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
         }
 
         /* Bottom Bar */
@@ -374,7 +390,7 @@
             width: calc(100% - 32px); /* Smaller width with margins */
             max-width: 400px;
             background-color: var(--bottom-bar-bg);
-            padding: 14px 14px; /* Uniform padding */
+            padding: 12px 14px; /* Uniform padding */
             display: flex;
             justify-content: space-around;
             border-radius: 40px; /* Fully rounded/circular rectangle */
@@ -477,7 +493,7 @@
 
         <header>
             <button class="icon-btn" style="margin-left: 4px;">
-                <img src="./icons/NotificationIcon.png" alt="Notification" style="width:20px;height:20px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                <img src="./icons/NotificationIcon.png" alt="Notification" style="width:30px;height:35px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
                 <svg class="fallback-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px; display:none;">
                     <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                     <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
@@ -491,7 +507,7 @@
             </div>
 
             <button class="icon-btn menu-btn">
-                <img src="./icons/MenuIcon.png" alt="Menu" style="width:20px;height:20px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                <img src="./icons/MenuIcon.png" alt="Menu" style="width:30px;height:35px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
                 <svg class="fallback-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px; display:none;">
                     <line x1="3" y1="12" x2="21" y2="12"></line>
                     <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -523,7 +539,8 @@
         <div class="floating-nav-container">
             <div class="floating-nav">
                 <div class="nav-pill-item">
-                    <svg viewBox="0 0 24 24" fill="currentColor">
+                    <img src="./icons/AppsIcon1.png" alt="Apps" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                    <svg viewBox="0 0 24 24" fill="currentColor" style="display:none;">
                         <rect x="3" y="3" width="7" height="7"></rect>
                         <rect x="14" y="3" width="7" height="7"></rect>
                         <rect x="14" y="14" width="7" height="7"></rect>
@@ -532,13 +549,15 @@
                     Apps
                 </div>
                 <div class="nav-pill-item active">
-                    <svg viewBox="0 0 24 24" fill="currentColor">
+                    <img src="./icons/HomeIcon1.png" alt="Home" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                    <svg viewBox="0 0 24 24" fill="currentColor" style="display:none;">
                         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                     </svg>
                     Home
                 </div>
                 <div class="nav-pill-item">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <img src="./icons/HistoryIcon1.png" alt="History" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
                         <circle cx="12" cy="12" r="10"></circle>
                         <polyline points="12 6 12 12 16 14"></polyline>
                     </svg>
@@ -549,7 +568,7 @@
 
         <nav class="bottom-bar">
             <div class="tab-item active">
-                <img src="./icons/WalletsIcon.png" alt="Wallets" style="width:40px;height:30px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                <img src="./icons/WalletsIcon.png" alt="Wallets" style="width:35px;height:30px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
                 <svg class="fallback-icon" viewBox="0 0 24 24" style="display:none;">
                     <rect x="2" y="4" width="20" height="16" rx="2"></rect>
                     <line x1="2" y1="10" x2="22" y2="10"></line>
@@ -557,7 +576,7 @@
                 Wallets
             </div>
             <div class="tab-item">
-                <img src="./icons/ReceiveIcon.png" alt="Receive" style="width:40px;height:30px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                <img src="./icons/ReceiveIcon.png" alt="Receive" style="width:35px;height:30px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
                 <svg class="fallback-icon" viewBox="0 0 24 24" style="display:none;">
                     <line x1="12" y1="5" x2="12" y2="19"></line>
                     <polyline points="19 12 12 19 5 12"></polyline>
@@ -565,7 +584,7 @@
                 Receive
             </div>
             <div class="tab-item">
-                <img src="./icons/SwapIcon.png" alt="Swap" style="width:40px;height:30px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                <img src="./icons/SwapIcon.png" alt="Swap" style="width:35px;height:30px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
                 <svg class="fallback-icon" viewBox="0 0 24 24" style="display:none;" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M7 10h14l-4-4"></path>
                     <path d="M17 14H3l4 4"></path>
@@ -573,7 +592,7 @@
                 Swap
             </div>
             <div class="tab-item">
-                <img src="./icons/SendIcon.png" alt="Send" style="width:40px;height:30px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                <img src="./icons/SendIcon.png" alt="Send" style="width:35px;height:30px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
                 <svg class="fallback-icon" viewBox="0 0 24 24" style="display:none;">
                     <line x1="12" y1="19" x2="12" y2="5"></line>
                     <polyline points="5 12 12 5 19 12"></polyline>
@@ -581,7 +600,7 @@
                 Send
             </div>
             <div class="tab-item">
-                <img src="./icons/BuyIcon.png" alt="Buy" style="width:40px;height:30px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                <img src="./icons/BuyIcon.png" alt="Buy" style="width:35px;height:30px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
                 <svg class="fallback-icon" viewBox="0 0 24 24" style="display:none;" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 1v22"></path>
                     <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
@@ -918,13 +937,7 @@
         fetchPrices();
         setInterval(fetchPrices, 60000); // Update prices every minute
 
-        // Navigation Interactions
-        document.querySelectorAll('.nav-pill-item, .tab-item').forEach(item => {
-            item.addEventListener('click', function() {
-                this.parentElement.querySelectorAll('.active').forEach(el => el.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
+        // Navigation Interactions disabled for bottom bar
 
     </script>
 </body>
