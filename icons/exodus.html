@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Exodus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #191b2a;
+            --text-main: #ffffff;
+            --text-muted: #8e9ab0;
+            --accent-green: #27d983;
+            --card-bg: #23283c;
+            --nav-bg: #23283c;
+        }
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #000;
+            color: var(--text-main);
+            overscroll-behavior-y: none;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        #background-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0d0e15;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 100px; /* Increased padding to clear status bar and app header offset */
+            box-sizing: border-box;
+        }
+        .status-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 44px; /* Standard iOS status bar height */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            box-sizing: border-box;
+            z-index: 20;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 15px;
+        }
+        .status-right {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        #app-container {
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
+            height: calc(100% - 50px); /* Leave space at top */
+            margin-top: 50px; /* Push down to reveal status bar */
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background: linear-gradient(180deg, #1e2235 0%, #191b2a 100%);
+            border-top-left-radius: 30px;
+            border-top-right-radius: 30px;
+            border-bottom-left-radius: 0; /* Full width at bottom usually */
+            border-bottom-right-radius: 0;
+            overflow: hidden;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+            z-index: 10;
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            will-change: transform;
+        }
+        .pull-indicator {
+            width: 36px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+        }
+
+        /* When dragging, disable transition for instant response */
+        #app-container.dragging {
+            transition: none;
+        }
+
+        .hidden-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 30px;
+            border-radius: 12px;
+            background-color: #191b2a;
+            margin-bottom: 10px;
+            width: 80%;
+            max-width: 350px;
+            color: var(--text-muted);
+            font-size: 16px;
+            font-weight: 500;
+        }
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            padding-top: calc(env(safe-area-inset-top, 20px) + 20px);
+            z-index: 5;
+        }
+        .header-left, .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .icon-btn {
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+        }
+        .icon-btn svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--text-main);
+        }
+        .app-main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+        .scroll-content {
+            overflow-y: auto;
+            padding: 20px;
+            padding-top: 0;
+            height: 100%;
+            scrollbar-width: none; /* Firefox */
+        }
+        .scroll-content::-webkit-scrollbar {
+            display: none; /* Safari and Chrome */
+        }
+        #app-container::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 250px;
+            background: linear-gradient(180deg, rgba(25, 27, 42, 0) 0%, #191b2a 100%);
+            pointer-events: none;
+            z-index: 5;
+        }
+        .balance-container {
+            margin-top: 0;
+            padding-top: 20px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+        }
+        .balance-circle {
+            position: relative;
+        }
+        .donut {
+            transform: rotate(-90deg);
+        }
+        .balance-amount {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 32px;
+            font-weight: 600;
+        }
+        .security-banner {
+            background: linear-gradient(90deg, #3a317a 0%, #533e8f 100%);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 30px;
+            width: 100%;
+            max-width: 380px;
+            margin-left: auto;
+            margin-right: auto;
+            z-index: 1;
+            position: relative;
+        }
+        .security-banner-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .security-banner-text {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        .security-title {
+            font-weight: 500;
+            font-size: 15px;
+        }
+        .security-subtitle {
+            color: #c1bdf5;
+            font-size: 13px;
+        }
+        .close-btn {
+            margin-left: auto;
+        }
+        .close-btn svg {
+            stroke: #c1bdf5;
+        }
+        .asset-list {
+            width: 100%;
+            margin-top: 0px;
+            padding-bottom: 120px; /* For bottom nav */
+        }
+        .asset-item {
+            display: flex;
+            align-items: center;
+            padding: 25px 0;
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            margin-bottom: 10px;
+            padding: 30px;
+        }
+        .asset-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+        .asset-info {
+            flex-grow: 1;
+        }
+        .asset-name {
+            font-weight: 500;
+            font-size: 16px;
+        }
+        .asset-price {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+        .asset-balance {
+            text-align: right;
+        }
+        .asset-value-crypto {
+            font-weight: 500;
+            font-size: 16px;
+        }
+        .asset-value-usd {
+            color: var(--text-main);
+            font-size: 13px;
+        }
+        .bottom-nav {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            pointer-events: none; /* Let clicks pass through transparent parts if any */
+        }
+        .bottom-nav img {
+            width: 300px; /* Approximate width for the 3-part menu */
+            height: auto;
+            pointer-events: auto;
+            filter: drop-shadow(0 4px 20px rgba(0,0,0,0.4));
+        }
+        .security-banner-img {
+            width: 413px;
+            max-width: 10000px;
+            height: 115px;
+            display: block;
+            margin: 0px auto 0 auto;
+            border-radius: 10px; /* Assuming the image might need rounded corners or is already rounded */
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="background-layer">
+        <div class="hidden-menu-item">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8e9ab0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <span>Search Assets</span>
+        </div>
+        <div class="hidden-menu-item">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8e9ab0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            <span>Settings</span>
+        </div>
+    </div>
+    <div id="app-container">
+        <div class="pull-indicator"></div>
+        <header class="app-header">
+            <div class="header-left">
+                <svg class="icon-btn" width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M14 0.5C12.5948 0.5 11.2038 0.869988 9.94439 1.5799C8.68497 2.28981 7.59171 3.3193 6.76822 4.57569C5.94472 5.83208 5.41891 7.2761 5.24373 8.7833C5.06855 10.2905 5.25013 11.8178 5.77367 13.2222L5.77378 13.2225L13.2225 5.77378C11.8181 5.25025 10.2908 5.06866 8.78358 5.24385C7.27636 5.41903 5.83236 5.94483 4.57595 6.76831C3.31954 7.59179 2.28999 8.68504 1.58005 9.94445C0.870112 11.2039 0.5 12.5948 0.5 14C0.5 16.0168 1.13661 17.9883 2.2983 19.6168L2.29841 19.617L19.617 2.29841C17.9885 1.13672 16.017 0.5 14 0.5Z" fill="#F05A28"/>
+                    <path d="M22.2262 14.7775L14.7775 22.2262C16.1819 22.7498 17.7092 22.9313 19.2164 22.7562C20.7236 22.581 22.1676 22.0552 23.424 21.2317C24.6804 20.4082 25.71 19.315 26.42 18.0555C27.1299 16.7961 27.5 15.4052 27.5 14C27.5 11.9832 26.8634 10.0117 25.7017 8.38321L25.7016 8.38309L8.38298 25.7016C10.0115 26.8633 11.983 27.5 14 27.5C15.4052 27.5 16.7962 27.13 18.0556 26.4201C19.315 25.7102 20.4083 24.6807 21.2318 23.4243C22.0553 22.1679 22.5811 20.7239 22.7563 19.2167C22.9314 17.7095 22.7499 16.1822 22.2263 14.7778L22.2262 14.7775Z" fill="#F05A28"/>
+                </svg>
+            </div>
+            <div class="header-right">
+                <button class="icon-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </button>
+                <button class="icon-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <main class="app-main" id="scroll-container">
+            <div class="scroll-content">
+                <div class="balance-container">
+                    <div class="balance-circle">
+                        <svg class="donut" width="350" height="350" viewBox="0 0 100 100">
+                            <!-- Background ring removed as requested -->
+                        </svg>
+                        <div class="balance-amount">
+                            $80,143.92
+                        </div>
+                    </div>
+                </div>
+
+                <img src="advancedsecurity.png" class="security-banner-img" alt="Advanced Security">
+
+                <div class="asset-list">
+                    <!-- Asset items will be injected here -->
+                </div>
+            </div>
+        </main>
+
+        <div class="bottom-nav">
+            <img src="centershit.png" alt="Navigation">
+        </div>
+
+    </div>
+
+    <script>
+        const assets = [
+            {
+                name: 'Tether USD',
+                symbol: 'USDT',
+                price: 0.9991,
+                change: 0.1,
+                value_usd: 80143.92,
+                value_crypto: 80218.6,
+                icon: 'https://s2.coinmarketcap.com/static/img/coins/64x64/825.png',
+                color: '#26A17B'
+            },
+            {
+                name: 'Bitcoin',
+                symbol: 'BTC',
+                price: 89678.83,
+                change: -0.3,
+                value_usd: 89678.83,
+                value_crypto: 1,
+                icon: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1.png',
+                color: '#F7931A'
+            },
+            {
+                name: 'Ethereum',
+                symbol: 'ETH',
+                price: 2947.88,
+                change: -2.7,
+                value_usd: 2947.88,
+                value_crypto: 1,
+                icon: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
+                color: '#627EEA'
+            }
+        ];
+
+        const assetList = document.querySelector('.asset-list');
+        const donut = document.querySelector('.donut');
+        const balanceAmount = document.querySelector('.balance-amount');
+
+        // Sort assets by value descending
+        assets.sort((a, b) => b.value_usd - a.value_usd);
+
+        const totalValue = assets.reduce((acc, asset) => acc + asset.value_usd, 0);
+        balanceAmount.textContent = '$' + totalValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+        let cumulativePercentage = 0;
+
+        assets.forEach((asset, index) => {
+            const item = document.createElement('div');
+            item.classList.add('asset-item');
+
+            item.innerHTML = `
+                <img src="${asset.icon}" alt="${asset.name}" class="asset-icon">
+                <div class="asset-info">
+                    <div class="asset-name">${asset.name}</div>
+                    <div class="asset-price">$${asset.price.toLocaleString()} <span style="color: ${asset.change > 0 ? 'var(--accent-green)' : '#ff3b30'}">${asset.change > 0 ? '+' : ''}${asset.change}%</span></div>
+                </div>
+                <div class="asset-balance">
+                    <div class="asset-value-crypto" style="color: ${asset.color}">${asset.value_crypto.toLocaleString()} ${asset.symbol}</div>
+                    <div class="asset-value-usd">$${asset.value_usd.toLocaleString()}</div>
+                </div>
+            `;
+
+            assetList.appendChild(item);
+
+            // Calculate percentage
+            let percentage = (asset.value_usd / totalValue) * 100;
+            
+            // If it's the last asset, ensure it fills the remaining space to close the loop
+            if (index === assets.length - 1) {
+                percentage = 100 - cumulativePercentage;
+            }
+
+            const dashoffset = 282.743338823 * (1 - percentage / 100);
+
+            const segment = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            segment.setAttribute("class", "donut-segment");
+            segment.setAttribute("cx", "50");
+            segment.setAttribute("cy", "50");
+            segment.setAttribute("r", "45");
+            segment.setAttribute("fill", "transparent");
+            segment.setAttribute("stroke", asset.color);
+            segment.setAttribute("stroke-width", "3");
+            segment.setAttribute("stroke-dasharray", "282.743338823");
+            segment.setAttribute("stroke-dashoffset", dashoffset);
+            segment.setAttribute("transform", `rotate(${(cumulativePercentage * 3.6)} 50 50)`);
+            
+            // Ensure rounded caps don't look weird by adjusting z-index via order? 
+            // SVG doesn't support z-index, order matters. Largest first (sorted) is good.
+
+            donut.appendChild(segment);
+
+            cumulativePercentage += percentage;
+        });
+        
+        // Removed the line that was deleting the first segment
+
+        // Pull-down interaction logic
+        const appContainer = document.getElementById('app-container');
+        const scrollContent = document.querySelector('.scroll-content');
+        let startY = 0;
+        let currentY = 0;
+        let isDragging = false;
+        const MAX_DRAG = 150; // Maximum pixels to drag down
+        const DRAG_THRESHOLD = 5; // Pixels to move before considering it a drag
+
+        // Helper to check if we are at the top of the scrollable content
+        function isAtTop() {
+            return scrollContent.scrollTop <= 0;
+        }
+
+        appContainer.addEventListener('touchstart', (e) => {
+            if (!isAtTop()) return;
+            startY = e.touches[0].clientY;
+            isDragging = false;
+            // Don't prevent default yet, might be a normal scroll
+        }, { passive: true });
+
+        appContainer.addEventListener('touchmove', (e) => {
+            if (!isAtTop()) return;
+            
+            const y = e.touches[0].clientY;
+            const deltaY = y - startY;
+
+            // Only start dragging if we are pulling down and have moved past threshold
+            if (deltaY > DRAG_THRESHOLD && !isDragging) {
+                isDragging = true;
+                appContainer.classList.add('dragging');
+            }
+
+            if (isDragging && deltaY > 0) {
+                // Prevent default to stop scrolling the body/viewport
+                if (e.cancelable) e.preventDefault();
+                
+                // Apply resistance (logarithmic or square root)
+                // ease-out effect: output = limit * (1 - exp(-input / limit))
+                // or simple resistance: deltaY * 0.4
+                const resistance = 0.4;
+                currentY = Math.min(deltaY * resistance, MAX_DRAG);
+                
+                appContainer.style.transform = `translateY(${currentY}px) scale(${1 - (currentY/1000)})`;
+            }
+        }, { passive: false });
+
+        appContainer.addEventListener('touchend', () => {
+            if (!isDragging) return;
+            
+            isDragging = false;
+            appContainer.classList.remove('dragging');
+            appContainer.style.transform = ''; // Revert to CSS transition
+            currentY = 0;
+        });
+
+        // Mouse events for testing on desktop
+        appContainer.addEventListener('mousedown', (e) => {
+            if (!isAtTop()) return;
+            startY = e.clientY;
+            isDragging = false;
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (startY === 0) return; // Not mouse down
+            
+            const y = e.clientY;
+            const deltaY = y - startY;
+
+            if (deltaY > DRAG_THRESHOLD && !isDragging && isAtTop()) {
+                isDragging = true;
+                appContainer.classList.add('dragging');
+            }
+
+            if (isDragging && deltaY > 0) {
+                const resistance = 0.4;
+                currentY = Math.min(deltaY * resistance, MAX_DRAG);
+                appContainer.style.transform = `translateY(${currentY}px) scale(${1 - (currentY/1000)})`;
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                appContainer.classList.remove('dragging');
+                appContainer.style.transform = '';
+            }
+            startY = 0;
+        });
+
+    </script>
+</body>
+</html>
