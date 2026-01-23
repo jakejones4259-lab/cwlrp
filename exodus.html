@@ -121,14 +121,37 @@
             box-shadow: 0 -10px 40px rgba(0,0,0,0.11);
             z-index: 10;
         }
+
+        #app-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            border-radius: inherit;
+            background-image: 
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(83, 90, 143, 0.15) 0%, transparent 40%),
+                repeating-linear-gradient(
+                    180deg,
+                    transparent,
+                    transparent 14px,
+                    rgba(0, 0, 0, 0.04) 15px
+                );
+            background-size: 100% 100%, 100% 15px;
+        }
         
         .pull-indicator {
-            width: 40px;
+            width: 70px;
             height: 5px;
             background-color: rgba(255, 255, 255, 0.2);
             border-radius: 3px;
             margin: 10px auto 5px; /* Center horizontally, add top margin */
             flex-shrink: 0;
+            position: relative;
+            z-index: 1;
         }
 
         .settings-asset-item {
@@ -532,17 +555,16 @@
     </div>
     <div id="app-container">
         <div class="pull-indicator"></div>
-        <header class="app-header">
-            <div class="header-left">
-                <img src="topleft.png" style="height: 65px; cursor: pointer;">
-            </div>
-            <div class="header-right">
-                <img src="buttons.png" style="height: 65px; cursor: pointer;">
-            </div>
-        </header>
-
         <main class="app-main" id="scroll-container">
             <div class="scroll-content">
+                <header class="app-header">
+                    <div class="header-left">
+                        <img src="topleft.png" style="height: 65px; cursor: pointer;">
+                    </div>
+                    <div class="header-right">
+                        <img src="buttons.png" style="height: 65px; cursor: pointer;">
+                    </div>
+                </header>
                 <div class="balance-container">
                     <div class="balance-circle">
                         <svg class="donut" width="300" height="300" viewBox="0 0 100 100">
@@ -1205,6 +1227,22 @@
             document.removeEventListener('mouseup', onMouseUp);
             startY = 0; // Reset
         };
+
+        // Hide pull indicator on scroll
+        scrollContent.addEventListener('scroll', () => {
+            const currentIndicator = document.querySelector('.pull-indicator');
+            
+            if (scrollContent.scrollTop > 10) {
+                if (currentIndicator) {
+                    currentIndicator.remove();
+                }
+            } else if (!currentIndicator) {
+                // Add it back when scrolling to top
+                const newIndicator = document.createElement('div');
+                newIndicator.className = 'pull-indicator';
+                appContainer.insertBefore(newIndicator, appContainer.firstChild);
+            }
+        });
     });
     </script>
     </div>
