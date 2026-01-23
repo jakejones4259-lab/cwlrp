@@ -24,6 +24,7 @@
             margin: 0 auto;
             position: relative;
             overflow: hidden;
+            z-index: 10;
             box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
         body {
@@ -427,7 +428,17 @@
             width: 250px; /* Approximate width for the 3-part menu */
             height: auto;
             pointer-events: auto;
-            filter: drop-shadow(0 4px 20px rgba(0,0,0,0.4));
+            filter: drop-shadow(0 4px 20px (#1a1b2b));
+        }
+        .bottom-fade {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(to top, #202136 10%, rgba(19, 20, 31, 0) 100%);
+            z-index: 15;
+            pointer-events: none;
         }
         .security-banner-img {
             display: block;
@@ -486,6 +497,7 @@
             </div>
         </main>
 
+        <div class="bottom-fade"></div>
         <div class="bottom-nav">
             <img src="centershit.png" alt="Navigation">
         </div>
@@ -578,7 +590,7 @@
                 enabled: true
             },
             {
-                name: 'USD Coin',
+                name: 'USDC',
                 symbol: 'USDC',
                 coingecko_id: 'usd-coin',
                 price: 1.00,
@@ -705,6 +717,10 @@
         });
 
             function animateValue(element, oldVal, newVal, isCurrency = true, useColorEffect = false) {
+        // Safety check for undefined/null values
+        if (oldVal === undefined || oldVal === null) oldVal = 0;
+        if (newVal === undefined || newVal === null) newVal = 0;
+
         const oldValStr = isCurrency ? formatCurrency(oldVal) : String(oldVal);
         const newValStr = isCurrency ? formatCurrency(newVal) : String(newVal);
 
@@ -863,7 +879,12 @@
         function createDonutSegment(asset, percentage, startPercentage) {
             if (percentage <= 0) return;
 
-            const dashoffset = 282.743338823 * (1 - percentage / 100);
+            const circumference = 282.743338823;
+            const gapLength = 1; // Gap between segments
+
+            // Calculate dashoffset
+            // We add the gapLength to the offset to shorten the visible stroke, creating a gap at the end
+            let dashoffset = circumference * (1 - percentage / 100) + gapLength;
 
             const segment = document.createElementNS("http://www.w3.org/2000/svg", "circle");
             segment.setAttribute("class", "donut-segment");
@@ -872,8 +893,8 @@
             segment.setAttribute("r", "45");
             segment.setAttribute("fill", "transparent");
             segment.setAttribute("stroke", asset.color);
-            segment.setAttribute("stroke-width", "2");
-            segment.setAttribute("stroke-dasharray", "282.743338823");
+            segment.setAttribute("stroke-width", "3");
+            segment.setAttribute("stroke-dasharray", circumference);
             segment.setAttribute("stroke-dashoffset", dashoffset);
             segment.setAttribute("transform", `rotate(${(startPercentage * 3.6)} 50 50)`);
             
@@ -969,11 +990,19 @@
                 assets.forEach(asset => {
                     const priceData = data[asset.coingecko_id];
                     if (priceData) {
-                        asset.price = priceData.usd;
-                        asset.change = priceData.usd_24h_change;
-                        // Recalculate USD value based on new price if it's not 0
-                        if (asset.value_crypto > 0) {
-                            asset.value_usd = asset.value_crypto * asset.price;
+                        const newPrice = priceData.usd;
+                        const newChange = priceData.usd_24h_change;
+
+                        if (newPrice !== undefined) {
+                            asset.price = newPrice;
+                            // Recalculate USD value based on new price if it's not 0
+                            if (asset.value_crypto > 0) {
+                                asset.value_usd = asset.value_crypto * asset.price;
+                            }
+                        }
+
+                        if (newChange !== undefined) {
+                            asset.change = newChange;
                         }
                     }
                 });
