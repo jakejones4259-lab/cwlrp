@@ -18,6 +18,14 @@
             --card-bg: #23283c;
             --nav-bg: #23283c;
         }
+        #device-frame {
+            max-width: 450px;
+            height: 100vh;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
         body {
             margin: 0;
             font-family: 'Inter', sans-serif;
@@ -25,7 +33,7 @@
             color: var(--text-main);
             overscroll-behavior-y: none;
             height: 100vh;
-            overflow: hidden;
+            overflow-x: hidden;
             position: relative;
         }
         #background-layer {
@@ -39,8 +47,22 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding-top: 100px; /* Increased padding to clear status bar and app header offset */
+            padding-top: 60px;
             box-sizing: border-box;
+            overflow-y: auto;
+        }
+        .settings-container {
+            width: 100%;
+            padding: 20px;
+            padding-bottom: 200px; /* Added extra padding for scrolling */
+            box-sizing: border-box;
+        }
+        .settings-container h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+            color: var(--text-main);
         }
         .status-bar {
             position: absolute;
@@ -65,16 +87,14 @@
         }
         #app-container {
             width: 100%;
-            max-width: 450px;
-            margin: 0 auto;
             height: calc(100% - 50px); /* Leave space at top */
             margin-top: 50px; /* Push down to reveal status bar */
             display: flex;
             flex-direction: column;
             position: relative;
             background: linear-gradient(180deg, #1e2235 0%, #191b2a 100%);
-            border-top-left-radius: 30px;
-            border-top-right-radius: 30px;
+            border-top-left-radius: 50px;
+            border-top-right-radius: 50px;
             border-bottom-left-radius: 0; /* Full width at bottom usually */
             border-bottom-right-radius: 0;
             overflow: hidden;
@@ -100,20 +120,97 @@
             transition: none;
         }
 
-        .hidden-menu-item {
+        .settings-asset-item {
             display: flex;
             align-items: center;
-            gap: 15px;
-            padding: 15px 30px;
+            background-color: var(--card-bg);
             border-radius: 12px;
-            background-color: #191b2a;
+            padding: 15px;
             margin-bottom: 10px;
-            width: 80%;
-            max-width: 350px;
-            color: var(--text-muted);
-            font-size: 16px;
+        }
+        .settings-asset-icon {
+            width: 32px;
+            height: 32px;
+            margin-right: 12px;
+        }
+        .settings-asset-info {
+            flex-grow: 1;
+        }
+        .settings-asset-name {
+            font-weight: 500;
+            font-size: 15px;
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+            margin-left: 15px;
+        }
+        .toggle-switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #3a3f58;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: var(--accent-green);
+        }
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+        .edit-controls {
+            display: none; /* Hidden by default */
+            padding: 15px;
+            background-color: #1e2235;
+            margin-top: -10px;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .input-group input {
+            flex-grow: 1;
+            background-color: #2b3048;
+            border: 1px solid #3a3f58;
+            border-radius: 8px;
+            color: var(--text-main);
+            padding: 10px;
+            font-size: 14px;
+        }
+        .currency-switcher {
+            background: none;
+            border: none;
+            color: var(--accent-green);
+            cursor: pointer;
             font-weight: 500;
         }
+
         .app-header {
             display: flex;
             justify-content: space-between;
@@ -188,7 +285,47 @@
             transform: translate(-50%, -50%);
             font-size: 32px;
             font-weight: 600;
+            white-space: nowrap; /* Prevent line wrapping */
+            font-variant-numeric: tabular-nums; /* Fixes wiggly text by making all digits same width */
         }
+        .balance-amount.updating {
+            animation: green-blink 0.5s ease-in-out;
+        }
+
+        .digit-container {
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+            height: 1.2em; /* Slightly taller to prevent clipping */
+            vertical-align: bottom;
+        }
+
+        .digit-reel {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); /* Smoother easing */
+            will-change: transform;
+        }
+
+        .digit {
+            display: block;
+            line-height: 1.2em; /* Match container height */
+            height: 1.2em;
+            text-align: center;
+        }
+
+        @keyframes green-blink {
+            0%, 100% { color: var(--text-main); }
+            50% { color: var(--accent-green); }
+        }
+
+        @keyframes quick-fade {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+        
         .security-banner {
             background: linear-gradient(90deg, #3a317a 0%, #533e8f 100%);
             border-radius: 10px;
@@ -286,25 +423,28 @@
             filter: drop-shadow(0 4px 20px rgba(0,0,0,0.4));
         }
         .security-banner-img {
-            width: 413px;
-            max-width: 10000px;
-            height: 115px;
             display: block;
-            margin: 0px auto 0 auto;
-            border-radius: 10px; /* Assuming the image might need rounded corners or is already rounded */
+            width: 100%;
+            height: auto;
+            margin-top: 30px;
+            border-radius: 10px;
             cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <div id="background-layer">
-        <div class="hidden-menu-item">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8e9ab0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <span>Search Assets</span>
+    <div id="device-frame">
+        <div class="status-bar">
+            <div class="status-left">9:41</div>
+            <div class="status-right">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="10.67" viewBox="0 0 17 10.67" fill="none"><path d="M1.33333 4V2.66667C1.33333 1.93333 1.93333 1.33333 2.66667 1.33333H14.3333C15.0667 1.33333 15.6667 1.93333 15.6667 2.66667V8C15.6667 8.73333 15.0667 9.33333 14.3333 9.33333H11.3333" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M12 1.33333L12 9.33333" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M1.33333 6.66667H8V9.33333H1.33333V6.66667Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="15.33" height="10.67" viewBox="0 0 15.33 10.67" fill="none"><path d="M14 1.33333C14 0.966667 14 0.783333 13.9333 0.64C13.8 0.346667 13.5833 0.133333 13.2833 0.0666667C13.14 0 12.9533 0 12.5833 0H2.75C2.38 0 2.19667 0 2.05333 0.0666667C1.75333 0.133333 1.53667 0.346667 1.40333 0.64C1.33667 0.783333 1.33667 0.966667 1.33667 1.33333V9.33333C1.33667 9.7 1.33667 9.88333 1.40333 10.0267C1.53667 10.32 1.75333 10.5333 2.05333 10.6C2.19667 10.6667 2.38 10.6667 2.75 10.6667H12.5833C12.9533 10.6667 13.14 10.6667 13.2833 10.6C13.5833 10.5333 13.8 10.32 13.9333 10.0267C14 9.88333 14 9.7 14 9.33333V1.33333Z" stroke="white" stroke-width="1.5"></path><path d="M15.3333 3.33333V7.33333" stroke="white" stroke-width="1.5" stroke-linecap="round"></path></svg>
+            </div>
         </div>
-        <div class="hidden-menu-item">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8e9ab0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-            <span>Settings</span>
+    <div id="background-layer">
+        <div class="settings-container">
+            <h2>Portfolio</h2>
+            <div id="settings-asset-list"></div>
         </div>
     </div>
     <div id="app-container">
@@ -338,8 +478,8 @@
                         <svg class="donut" width="350" height="350" viewBox="0 0 100 100">
                             <!-- Background ring removed as requested -->
                         </svg>
-                        <div class="balance-amount">
-                            $80,143.92
+                        <div class="balance-amount" id="balance-amount">
+                            <!-- Digits will be injected here -->
                         </div>
                     </div>
                 </div>
@@ -359,76 +499,332 @@
     </div>
 
     <script>
-        const assets = [
-            {
-                name: 'Tether USD',
-                symbol: 'USDT',
-                price: 0.9991,
-                change: 0.1,
-                value_usd: 80143.92,
-                value_crypto: 80218.6,
-                icon: 'https://s2.coinmarketcap.com/static/img/coins/64x64/825.png',
-                color: '#26A17B'
-            },
+        document.addEventListener('DOMContentLoaded', () => {
+            // DOM element declarations - moved to top to avoid reference errors
+            const assetList = document.querySelector('.asset-list');
+            const donut = document.querySelector('.donut');
+            const balanceAmount = document.querySelector('.balance-amount');
+            const settingsAssetList = document.getElementById('settings-asset-list');
+            const appContainer = document.getElementById('app-container');
+            const backgroundLayer = document.getElementById('background-layer');
+
+            let lastTotalValue = 0;
+
+            // Helper to format currency
+            const formatCurrency = (value) => {
+                return new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }).format(value || 0);
+            };
+
+
+            const assets = [
             {
                 name: 'Bitcoin',
                 symbol: 'BTC',
-                price: 89678.83,
-                change: -0.3,
-                value_usd: 89678.83,
-                value_crypto: 1,
-                icon: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1.png',
-                color: '#F7931A'
+                coingecko_id: 'bitcoin',
+                price: 68000.00,
+                change: -0.5,
+                value_usd: 34000.00,
+                value_crypto: 0.5,
+                icon: 'exoduscoins/BTC.svg',
+                color: '#F7931A',
+                enabled: true
             },
             {
                 name: 'Ethereum',
                 symbol: 'ETH',
-                price: 2947.88,
-                change: -2.7,
-                value_usd: 2947.88,
-                value_crypto: 1,
-                icon: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
-                color: '#627EEA'
+                coingecko_id: 'ethereum',
+                price: 3500.00,
+                change: -2.1,
+                value_usd: 17500.00,
+                value_crypto: 5,
+                icon: 'exoduscoins/ETH.svg',
+                color: '#627EEA',
+                network: 'eth',
+                enabled: true
+            },
+            {
+                name: 'Cardano',
+                symbol: 'ADA',
+                coingecko_id: 'cardano',
+                price: 0.45,
+                change: 1.2,
+                value_usd: 4500.00,
+                value_crypto: 10000,
+                icon: 'exoduscoins/ADA.svg',
+                color: '#0033AD',
+                enabled: true
+            },
+            {
+                name: 'Avalanche',
+                symbol: 'AVAX',
+                coingecko_id: 'avalanche-2',
+                price: 35.00,
+                change: 3.5,
+                value_usd: 3500.00,
+                value_crypto: 100,
+                icon: 'exoduscoins/AVAX.svg',
+                color: '#E84142',
+                enabled: true
+            },
+            {
+                name: 'DAI',
+                symbol: 'DAI',
+                coingecko_id: 'dai',
+                price: 1.00,
+                change: 0.0,
+                value_usd: 5000.00,
+                value_crypto: 5000,
+                icon: 'exoduscoins/DAI.svg',
+                color: '#F4B731',
+                enabled: true
+            },
+            {
+                name: 'USD Coin',
+                symbol: 'USDC',
+                coingecko_id: 'usd-coin',
+                price: 1.00,
+                change: 0.0,
+                value_usd: 10000.00,
+                value_crypto: 10000,
+                icon: 'exoduscoins/USDC.svg',
+                color: '#2775CA',
+                enabled: true
+            },
+            {
+                name: 'Chainlink',
+                symbol: 'LINK',
+                coingecko_id: 'chainlink',
+                price: 18.00,
+                change: -1.8,
+                value_usd: 1800.00,
+                value_crypto: 100,
+                icon: 'exoduscoins/LINK.svg',
+                color: '#2A5ADA',
+                enabled: true
+            },
+            {
+                name: 'BNB',
+                symbol: 'BNB',
+                coingecko_id: 'binancecoin',
+                price: 600.00,
+                change: 0.8,
+                value_usd: 6000.00,
+                value_crypto: 10,
+                icon: 'exoduscoins/BNB.svg',
+                color: '#F3BA2F',
+                enabled: true
+            },
+            {
+                name: 'Fantom',
+                symbol: 'FTM',
+                coingecko_id: 'fantom',
+                price: 0.80,
+                change: 5.0,
+                value_usd: 800.00,
+                value_crypto: 1000,
+                icon: 'exoduscoins/FTM.svg',
+                color: '#1969FF',
+                enabled: true
+            },
+            {
+                name: 'Polygon',
+                symbol: 'POL',
+                coingecko_id: 'matic-network',
+                price: 0.70,
+                change: -0.2,
+                value_usd: 700.00,
+                value_crypto: 1000,
+                icon: 'exoduscoins/POL.svg',
+                color: '#8247E5',
+                enabled: true
+            },
+            {
+                name: 'Solana',
+                symbol: 'SOL',
+                coingecko_id: 'solana',
+                price: 150.00,
+                change: 2.5,
+                value_usd: 7500.00,
+                value_crypto: 50,
+                icon: 'exoduscoins/SOL.svg',
+                color: '#9945FF'
             }
         ];
 
-        const assetList = document.querySelector('.asset-list');
-        const donut = document.querySelector('.donut');
-        const balanceAmount = document.querySelector('.balance-amount');
 
-        // Sort assets by value descending
-        assets.sort((a, b) => b.value_usd - a.value_usd);
 
-        const totalValue = assets.reduce((acc, asset) => acc + asset.value_usd, 0);
-        balanceAmount.textContent = '$' + totalValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        settingsAssetList.addEventListener('change', (e) => {
+            if (e.target.type === 'checkbox') {
+                const index = e.target.dataset.index;
+                const editControls = e.target.closest('.settings-asset-item').nextElementSibling;
+                
+                assets[index].enabled = e.target.checked;
 
-        let cumulativePercentage = 0;
-
-        assets.forEach((asset, index) => {
-            const item = document.createElement('div');
-            item.classList.add('asset-item');
-
-            item.innerHTML = `
-                <img src="${asset.icon}" alt="${asset.name}" class="asset-icon">
-                <div class="asset-info">
-                    <div class="asset-name">${asset.name}</div>
-                    <div class="asset-price">$${asset.price.toLocaleString()} <span style="color: ${asset.change > 0 ? 'var(--accent-green)' : '#ff3b30'}">${asset.change > 0 ? '+' : ''}${asset.change}%</span></div>
-                </div>
-                <div class="asset-balance">
-                    <div class="asset-value-crypto" style="color: ${asset.color}">${asset.value_crypto.toLocaleString()} ${asset.symbol}</div>
-                    <div class="asset-value-usd">$${asset.value_usd.toLocaleString()}</div>
-                </div>
-            `;
-
-            assetList.appendChild(item);
-
-            // Calculate percentage
-            let percentage = (asset.value_usd / totalValue) * 100;
-            
-            // If it's the last asset, ensure it fills the remaining space to close the loop
-            if (index === assets.length - 1) {
-                percentage = 100 - cumulativePercentage;
+                if (e.target.checked) {
+                    editControls.style.display = 'block';
+                    // Maybe set a default value if asset was at 0
+                    if (assets[index].value_usd === 0) {
+                        assets[index].value_usd = 1; // Avoid division by zero
+                        assets[index].value_crypto = 1 / assets[index].price;
+                    }
+                } else {
+                    editControls.style.display = 'none';
+                    // We don't necessarily need to zero out the value, just hide it
+                }
+                // We need to re-render the main UI
+                renderMainUI();
+                renderSettings(); // To update the input fields
             }
+        });
+
+        settingsAssetList.addEventListener('input', (e) => {
+            if (e.target.tagName === 'INPUT' && e.target.type === 'number') {
+                const index = e.target.dataset.index;
+                const type = e.target.dataset.type;
+                const value = parseFloat(e.target.value);
+
+                if (type === 'crypto') {
+                    assets[index].value_crypto = value;
+                    assets[index].value_usd = value * assets[index].price;
+                } else if (type === 'usd') {
+                    assets[index].value_usd = value;
+                    assets[index].value_crypto = value / assets[index].price;
+                }
+                
+                // No need to re-render everything on every keystroke, but we should update the other input
+                const cryptoInput = settingsAssetList.querySelector(`input[data-index="${index}"][data-type="crypto"]`);
+                const usdInput = settingsAssetList.querySelector(`input[data-index="${index}"][data-type="usd"]`);
+                if (type === 'crypto') {
+                    usdInput.value = assets[index].value_usd.toFixed(2);
+                } else {
+                    cryptoInput.value = assets[index].value_crypto.toFixed(8);
+                }
+
+                // Debounce this in a real app, but for now, update on every input
+                renderMainUI();
+                renderSettings();
+            }
+        });
+
+        function updateBalanceWithAnimation(newTotal) {
+            const balanceContainer = document.getElementById('balance-amount');
+            const oldFormatted = formatCurrency(lastTotalValue);
+            const newFormatted = formatCurrency(newTotal);
+
+            if (oldFormatted === newFormatted) return;
+
+            balanceContainer.innerHTML = ''; // Clear previous content
+
+            const isIncreasing = newTotal > lastTotalValue;
+
+            // Trigger green blink animation
+            balanceContainer.classList.remove('updating');
+            void balanceContainer.offsetWidth; // Force reflow
+            balanceContainer.classList.add('updating');
+
+            for (let i = 0; i < newFormatted.length; i++) {
+                const oldChar = oldFormatted.length > i ? oldFormatted[i] : '';
+                const newChar = newFormatted[i];
+
+                const charContainer = document.createElement('span');
+                
+                if (!isNaN(parseInt(newChar)) && oldChar !== newChar && oldChar !== '') {
+                    charContainer.className = 'digit-container';
+                    const reel = document.createElement('span');
+                    reel.className = 'digit-reel';
+
+                    const oldDigitSpan = document.createElement('span');
+                    oldDigitSpan.className = 'digit';
+                    oldDigitSpan.textContent = oldChar;
+
+                    const newDigitSpan = document.createElement('span');
+                    newDigitSpan.className = 'digit';
+                    newDigitSpan.textContent = newChar;
+
+                    if (isIncreasing) {
+                        // Moving UP (numbers increasing usually scroll down visually in some designs, but let's stick to standard reel logic)
+                        // If increasing: Old is Top, New is Bottom. We slide UP to show new? 
+                        // Wait, user said: "scroll downwards (when the numbers increasing)"
+                        // Scroll downwards means content moves down. So New comes from Top?
+                        // Let's try: New is Top, Old is Bottom. Start at -1.2em (showing New), move to 0? No.
+                        // Start at 0 (showing Old), move to 1.2em (showing New above)?
+                        
+                        // Let's implement "Scroll Downwards" (New number comes from ABOVE)
+                        // Layout: [New] [Old]
+                        // Start: translateY(-1.2em) (Showing Old) -> End: translateY(0) (Showing New)
+                        
+                        reel.appendChild(newDigitSpan);
+                        reel.appendChild(oldDigitSpan);
+                        reel.style.transform = 'translateY(-1.2em)';
+                    } else {
+                        // Decreasing: "scroll upwards"
+                        // New number comes from BELOW
+                        // Layout: [Old] [New]
+                        // Start: translateY(0) (Showing Old) -> End: translateY(-1.2em) (Showing New)
+                        
+                        reel.appendChild(oldDigitSpan);
+                        reel.appendChild(newDigitSpan);
+                        reel.style.transform = 'translateY(0)';
+                    }
+                    
+                    charContainer.appendChild(reel);
+                    balanceContainer.appendChild(charContainer);
+
+                    // Force reflow to ensure start position is applied
+                    void reel.offsetHeight;
+
+                    // Trigger animation
+                    requestAnimationFrame(() => {
+                        if (isIncreasing) {
+                            reel.style.transform = 'translateY(0)';
+                        } else {
+                            reel.style.transform = 'translateY(-1.2em)';
+                        }
+                    });
+
+                } else {
+                    charContainer.textContent = newChar;
+                }
+                balanceContainer.appendChild(charContainer);
+            }
+            
+            // Cleanup after animation to prevent layout shifts/wiggles
+            setTimeout(() => {
+                balanceContainer.innerHTML = newFormatted;
+            }, 600); // slightly longer than transition
+
+            lastTotalValue = newTotal;
+        }
+
+        function renderMainUI() {
+            assetList.innerHTML = '';
+            donut.innerHTML = '';
+            
+            const sortedAssets = [...assets].sort((a, b) => b.value_usd - a.value_usd);
+            const totalValue = assets.reduce((acc, asset) => acc + (asset.enabled ? (asset.value_usd || 0) : 0), 0);
+            updateBalanceWithAnimation(totalValue);
+
+            let cumulativePercentage = 0;
+
+            const enabledAssets = sortedAssets.filter(asset => asset.enabled && asset.value_usd > 0);
+
+            enabledAssets.forEach(asset => {
+                renderAssetListItem(asset);
+                const percentage = (asset.value_usd / totalValue) * 100;
+                if(percentage > 0) {
+                    createDonutSegment(asset, percentage, cumulativePercentage);
+                    cumulativePercentage += percentage;
+                }
+            });
+        }
+
+        function createDonutSegment(asset, percentage, startPercentage) {
+            if (percentage <= 0) return;
 
             const dashoffset = 282.743338823 * (1 - percentage / 100);
 
@@ -439,111 +835,267 @@
             segment.setAttribute("r", "45");
             segment.setAttribute("fill", "transparent");
             segment.setAttribute("stroke", asset.color);
-            segment.setAttribute("stroke-width", "3");
+            segment.setAttribute("stroke-width", "2");
             segment.setAttribute("stroke-dasharray", "282.743338823");
             segment.setAttribute("stroke-dashoffset", dashoffset);
-            segment.setAttribute("transform", `rotate(${(cumulativePercentage * 3.6)} 50 50)`);
+            segment.setAttribute("transform", `rotate(${(startPercentage * 3.6)} 50 50)`);
             
-            // Ensure rounded caps don't look weird by adjusting z-index via order? 
-            // SVG doesn't support z-index, order matters. Largest first (sorted) is good.
-
             donut.appendChild(segment);
+        }
 
-            cumulativePercentage += percentage;
-        });
-        
-        // Removed the line that was deleting the first segment
+        function renderAssetListItem(asset) {
+            const item = document.createElement('div');
+            item.classList.add('asset-item');
+
+            const iconContainer = document.createElement('div');
+            iconContainer.classList.add('asset-icon-container');
+
+            const icon = document.createElement('img');
+            icon.src = asset.icon;
+            icon.alt = asset.name;
+            icon.classList.add('asset-icon');
+            iconContainer.appendChild(icon);
+
+            if (asset.network === 'eth') {
+                const overlay = document.createElement('div');
+                overlay.classList.add('network-overlay');
+                overlay.innerHTML = `<img src="exoduscoins/ethnetwork.svg" alt="ETH Network">`;
+                iconContainer.appendChild(overlay);
+            }
+
+            const changeValue = asset.change || 0;
+            const isPositive = changeValue > 0;
+            const changeColor = isPositive ? 'var(--accent-green)' : 'var(--text-muted)';
+            const changeSign = isPositive ? '+' : '';
+
+            item.innerHTML = `
+                <div class="asset-info">
+                    <div class="asset-name">${asset.name}</div>
+                    <div class="asset-price">$${(asset.price || 0).toLocaleString()} <span style="color: ${changeColor}">${changeSign}${changeValue.toFixed(2)}%</span></div>
+                </div>
+                <div class="asset-balance">
+                    <div class="asset-value-crypto" style="color: ${asset.color}">${(asset.value_crypto || 0).toLocaleString(undefined, {maximumFractionDigits: 8})} ${asset.symbol}</div>
+                    <div class="asset-value-usd">$${(asset.value_usd || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+                </div>
+            `;
+
+            item.prepend(iconContainer);
+            assetList.appendChild(item);
+        }
+
+        function renderSettings() {
+            settingsAssetList.innerHTML = '';
+            assets.forEach((asset, index) => {
+                const assetWrapper = document.createElement('div');
+
+                const item = document.createElement('div');
+                item.classList.add('settings-asset-item');
+                item.innerHTML = `
+                    <img src="${asset.icon}" alt="${asset.name}" class="settings-asset-icon">
+                    <div class="settings-asset-info">
+                        <div class="settings-asset-name">${asset.name}</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" ${asset.enabled ? 'checked' : ''} data-index="${index}">
+                        <span class="slider"></span>
+                    </label>
+                `;
+
+                const editControls = document.createElement('div');
+                editControls.classList.add('edit-controls');
+                if (asset.enabled) {
+                    editControls.style.display = 'block';
+                }
+                editControls.innerHTML = `
+                    <div class="input-group">
+                        <input type="number" value="${(asset.value_crypto || 0).toFixed(8)}" data-index="${index}" data-type="crypto">
+                        <span>${asset.symbol}</span>
+                        <button class="currency-switcher" data-index="${index}">⇅</button>
+                        <input type="number" value="${(asset.value_usd || 0).toFixed(2)}" data-index="${index}" data-type="usd">
+                        <span>USD</span>
+                    </div>
+                `;
+
+                assetWrapper.appendChild(item);
+                assetWrapper.appendChild(editControls);
+                settingsAssetList.appendChild(assetWrapper);
+            });
+        }
+
+        async function fetchPrices() {
+            const ids = assets.map(a => a.coingecko_id).join(',');
+            try {
+                const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`);
+                const data = await response.json();
+
+                assets.forEach(asset => {
+                    const priceData = data[asset.coingecko_id];
+                    if (priceData) {
+                        asset.price = priceData.usd;
+                        asset.change = priceData.usd_24h_change;
+                        // Recalculate USD value based on new price if it's not 0
+                        if (asset.value_crypto > 0) {
+                            asset.value_usd = asset.value_crypto * asset.price;
+                        }
+                    }
+                });
+
+                renderMainUI();
+                renderSettings(); // Also update the settings view
+            } catch (error) {
+                console.error("Error fetching prices:", error);
+            }
+        }
+
+        // Initial setup
+        renderMainUI();
+        renderSettings();
+        fetchPrices(); // Fetch prices on load
+        setInterval(fetchPrices, 60000); // And every 60 seconds
 
         // Pull-down interaction logic
-        const appContainer = document.getElementById('app-container');
         const scrollContent = document.querySelector('.scroll-content');
         let startY = 0;
         let currentY = 0;
         let isDragging = false;
-        const MAX_DRAG = 150; // Maximum pixels to drag down
-        const DRAG_THRESHOLD = 5; // Pixels to move before considering it a drag
+        let isOpen = false;
+        const OPEN_POSITION = 550; // How far down it sits when open
+        const DRAG_THRESHOLD = 10; // Pixels to move before considering it a drag
+        const SNAP_THRESHOLD = 100; // Pixels to drag to trigger snap
 
         // Helper to check if we are at the top of the scrollable content
         function isAtTop() {
             return scrollContent.scrollTop <= 0;
         }
 
+        function updateTransform(y) {
+            // Scale effect: 1 at 0px, 0.9 at OPEN_POSITION
+            const scale = 1 - (y / 5000); 
+            appContainer.style.transform = `translateY(${y}px) scale(${scale})`;
+        }
+
+        function snapOpen() {
+            isOpen = true;
+            currentY = OPEN_POSITION;
+            appContainer.classList.remove('dragging');
+            updateTransform(OPEN_POSITION);
+        }
+
+        function snapClosed() {
+            isOpen = false;
+            currentY = 0;
+            appContainer.classList.remove('dragging');
+            appContainer.style.transform = '';
+        }
+
+        appContainer.addEventListener('click', (e) => {
+            // If open and clicked (not dragged), close it
+            if (isOpen && !isDragging) {
+                snapClosed();
+            }
+        });
+
         appContainer.addEventListener('touchstart', (e) => {
-            if (!isAtTop()) return;
+            // If open, we can always drag. If closed, only if at top.
+            if (!isOpen && !isAtTop()) return;
+            
             startY = e.touches[0].clientY;
             isDragging = false;
             // Don't prevent default yet, might be a normal scroll
         }, { passive: true });
 
+        // Mouse support for desktop testing
+        let isMouseDown = false;
+
+        appContainer.addEventListener('mousedown', (e) => {
+            if (!isOpen && !isAtTop()) return;
+            isMouseDown = true;
+            startY = e.clientY;
+            isDragging = false;
+            console.log('Mouse down at', startY);
+        });
+
         appContainer.addEventListener('touchmove', (e) => {
-            if (!isAtTop()) return;
+            if (!isOpen && !isAtTop()) return;
             
             const y = e.touches[0].clientY;
             const deltaY = y - startY;
-
-            // Only start dragging if we are pulling down and have moved past threshold
-            if (deltaY > DRAG_THRESHOLD && !isDragging) {
-                isDragging = true;
-                appContainer.classList.add('dragging');
-            }
-
-            if (isDragging && deltaY > 0) {
-                // Prevent default to stop scrolling the body/viewport
-                if (e.cancelable) e.preventDefault();
-                
-                // Apply resistance (logarithmic or square root)
-                // ease-out effect: output = limit * (1 - exp(-input / limit))
-                // or simple resistance: deltaY * 0.4
-                const resistance = 0.4;
-                currentY = Math.min(deltaY * resistance, MAX_DRAG);
-                
-                appContainer.style.transform = `translateY(${currentY}px) scale(${1 - (currentY/1000)})`;
-            }
+            handleMove(y, deltaY, e);
         }, { passive: false });
 
+        // Mouse move
+        window.addEventListener('mousemove', (e) => {
+            if (!isMouseDown) return;
+
+            const y = e.clientY;
+            const deltaY = y - startY;
+            
+            // console.log('Mouse move', y, deltaY);
+            
+            handleMove(y, deltaY, e);
+        });
+
+        function handleMove(y, deltaY, e) {
+            // Check for drag start
+            if (Math.abs(deltaY) > DRAG_THRESHOLD && !isDragging) {
+                isDragging = true;
+                appContainer.classList.add('dragging');
+                console.log('Drag started');
+            }
+
+            if (isDragging) {
+                if (e.cancelable) e.preventDefault();
+
+                let targetY = isOpen ? OPEN_POSITION + deltaY : deltaY;
+                
+                // Resistance when pulling past limits
+                if (!isOpen && targetY < 0) targetY = targetY * 0.4; // Pulling up when closed
+                if (isOpen && targetY > OPEN_POSITION) targetY = OPEN_POSITION + (targetY - OPEN_POSITION) * 0.4; // Pulling down when open
+
+                // Apply resistance for normal pull
+                if (!isOpen && targetY > 0) targetY = targetY * 0.6;
+                
+                currentY = targetY;
+                updateTransform(currentY);
+            }
+        }
+
         appContainer.addEventListener('touchend', () => {
+            handleEnd();
+        });
+
+        // Mouse up
+        window.addEventListener('mouseup', () => {
+            if (isMouseDown) {
+                isMouseDown = false;
+                handleEnd();
+                console.log('Mouse up');
+            }
+        });
+
+        function handleEnd() {
             if (!isDragging) return;
             
             isDragging = false;
-            appContainer.classList.remove('dragging');
-            appContainer.style.transform = ''; // Revert to CSS transition
-            currentY = 0;
-        });
-
-        // Mouse events for testing on desktop
-        appContainer.addEventListener('mousedown', (e) => {
-            if (!isAtTop()) return;
-            startY = e.clientY;
-            isDragging = false;
-        });
-
-        window.addEventListener('mousemove', (e) => {
-            if (startY === 0) return; // Not mouse down
             
-            const y = e.clientY;
-            const deltaY = y - startY;
-
-            if (deltaY > DRAG_THRESHOLD && !isDragging && isAtTop()) {
-                isDragging = true;
-                appContainer.classList.add('dragging');
+            if (!isOpen) {
+                // If closed, check if we dragged down enough to open
+                if (currentY > SNAP_THRESHOLD) {
+                    snapOpen();
+                } else {
+                    snapClosed();
+                }
+            } else {
+                // If open, check if we dragged up enough to close
+                if (currentY < OPEN_POSITION - SNAP_THRESHOLD) {
+                    snapClosed();
+                } else {
+                    snapOpen();
+                }
             }
-
-            if (isDragging && deltaY > 0) {
-                const resistance = 0.4;
-                currentY = Math.min(deltaY * resistance, MAX_DRAG);
-                appContainer.style.transform = `translateY(${currentY}px) scale(${1 - (currentY/1000)})`;
-            }
-        });
-
-        window.addEventListener('mouseup', () => {
-            if (isDragging) {
-                isDragging = false;
-                appContainer.classList.remove('dragging');
-                appContainer.style.transform = '';
-            }
-            startY = 0;
-        });
-
+        }
+    });
     </script>
+    </div>
 </body>
 </html>
