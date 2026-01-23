@@ -15,7 +15,7 @@
             --text-main: #ffffff;
             --text-muted: #8e9ab0;
             --accent-green: #27d983;
-            --card-bg: #23283c;
+            --card-bg: #292C41;
             --nav-bg: #23283c;
         }
         #device-frame {
@@ -92,7 +92,7 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            background: linear-gradient(180deg, #1e2235 0%, #191b2a 100%);
+            background: linear-gradient(180deg, #2F3253 0%, #202136 100%);
             border-top-left-radius: 50px;
             border-top-right-radius: 50px;
             border-bottom-left-radius: 0; /* Full width at bottom usually */
@@ -314,6 +314,9 @@
             height: 1.2em;
             text-align: center;
         }
+        .digit-reel.moving .digit {
+            color: var(--text-muted);
+        }
 
         @keyframes green-blink {
             0%, 100% { color: var(--text-main); }
@@ -374,11 +377,11 @@
             background-color: var(--card-bg);
             border-radius: 15px;
             margin-bottom: 10px;
-            padding: 30px;
+            padding: 15px;
         }
         .asset-icon {
-            width: 40px;
-            height: 40px;
+            width: 55px;
+            height: 55px;
             border-radius: 50%;
             margin-right: 15px;
         }
@@ -394,7 +397,10 @@
             font-size: 13px;
         }
         .asset-balance {
-            text-align: right;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            font-variant-numeric: tabular-nums;
         }
         .asset-value-crypto {
             font-weight: 500;
@@ -403,6 +409,7 @@
         .asset-value-usd {
             color: var(--text-main);
             font-size: 13px;
+            font-variant-numeric: tabular-nums;
         }
         .bottom-nav {
             position: absolute;
@@ -462,7 +469,7 @@
             <div class="scroll-content">
                 <div class="balance-container">
                     <div class="balance-circle">
-                        <svg class="donut" width="350" height="350" viewBox="0 0 100 100">
+                        <svg class="donut" width="300" height="300" viewBox="0 0 100 100">
                             <!-- Background ring removed as requested -->
                         </svg>
                         <div class="balance-amount" id="balance-amount">
@@ -518,7 +525,7 @@
                 value_usd: 34000.00,
                 value_crypto: 0.5,
                 icon: 'exoduscoins/BTC.svg',
-                color: '#F7931A',
+                color: '#F4B731',
                 enabled: true
             },
             {
@@ -697,98 +704,97 @@
             }
         });
 
-        function updateBalanceWithAnimation(newTotal) {
-            const balanceContainer = document.getElementById('balance-amount');
-            const oldFormatted = formatCurrency(lastTotalValue);
-            const newFormatted = formatCurrency(newTotal);
+            function animateValue(element, oldVal, newVal, isCurrency = true, useColorEffect = false) {
+        const oldValStr = isCurrency ? formatCurrency(oldVal) : String(oldVal);
+        const newValStr = isCurrency ? formatCurrency(newVal) : String(newVal);
 
-            if (oldFormatted === newFormatted) return;
-
-            balanceContainer.innerHTML = ''; // Clear previous content
-
-            const isIncreasing = newTotal > lastTotalValue;
-
-            // Trigger green blink animation
-            balanceContainer.classList.remove('updating');
-            void balanceContainer.offsetWidth; // Force reflow
-            balanceContainer.classList.add('updating');
-
-            for (let i = 0; i < newFormatted.length; i++) {
-                const oldChar = oldFormatted.length > i ? oldFormatted[i] : '';
-                const newChar = newFormatted[i];
-
-                const charContainer = document.createElement('span');
-                
-                if (!isNaN(parseInt(newChar)) && oldChar !== newChar && oldChar !== '') {
-                    charContainer.className = 'digit-container';
-                    const reel = document.createElement('span');
-                    reel.className = 'digit-reel';
-
-                    const oldDigitSpan = document.createElement('span');
-                    oldDigitSpan.className = 'digit';
-                    oldDigitSpan.textContent = oldChar;
-
-                    const newDigitSpan = document.createElement('span');
-                    newDigitSpan.className = 'digit';
-                    newDigitSpan.textContent = newChar;
-
-                    if (isIncreasing) {
-                        // Moving UP (numbers increasing usually scroll down visually in some designs, but let's stick to standard reel logic)
-                        // If increasing: Old is Top, New is Bottom. We slide UP to show new? 
-                        // Wait, user said: "scroll downwards (when the numbers increasing)"
-                        // Scroll downwards means content moves down. So New comes from Top?
-                        // Let's try: New is Top, Old is Bottom. Start at -1.2em (showing New), move to 0? No.
-                        // Start at 0 (showing Old), move to 1.2em (showing New above)?
-                        
-                        // Let's implement "Scroll Downwards" (New number comes from ABOVE)
-                        // Layout: [New] [Old]
-                        // Start: translateY(-1.2em) (Showing Old) -> End: translateY(0) (Showing New)
-                        
-                        reel.appendChild(newDigitSpan);
-                        reel.appendChild(oldDigitSpan);
-                        reel.style.transform = 'translateY(-1.2em)';
-                    } else {
-                        // Decreasing: "scroll upwards"
-                        // New number comes from BELOW
-                        // Layout: [Old] [New]
-                        // Start: translateY(0) (Showing Old) -> End: translateY(-1.2em) (Showing New)
-                        
-                        reel.appendChild(oldDigitSpan);
-                        reel.appendChild(newDigitSpan);
-                        reel.style.transform = 'translateY(0)';
-                    }
-                    
-                    charContainer.appendChild(reel);
-                    balanceContainer.appendChild(charContainer);
-
-                    // Force reflow to ensure start position is applied
-                    void reel.offsetHeight;
-
-                    // Trigger animation
-                    requestAnimationFrame(() => {
-                        if (isIncreasing) {
-                            reel.style.transform = 'translateY(0)';
-                        } else {
-                            reel.style.transform = 'translateY(-1.2em)';
-                        }
-                    });
-
-                } else {
-                    charContainer.textContent = newChar;
-                }
-                balanceContainer.appendChild(charContainer);
+        if (oldValStr === newValStr) {
+            if(element.textContent !== newValStr) {
+                element.textContent = newValStr;
             }
-            
-            // Cleanup after animation to prevent layout shifts/wiggles
-            setTimeout(() => {
-                balanceContainer.innerHTML = newFormatted;
-            }, 600); // slightly longer than transition
-
-            lastTotalValue = newTotal;
+            return;
         }
 
+        element.innerHTML = ''; // Clear previous content
+
+        const isIncreasing = parseFloat(newVal.toString().replace(/[$,]/g, '')) > parseFloat(oldVal.toString().replace(/[$,]/g, ''));
+
+        if (useColorEffect && isIncreasing) {
+            element.classList.add('updating');
+            setTimeout(() => element.classList.remove('updating'), 500);
+        }
+
+        const oldChars = oldValStr.split('');
+        const newChars = newValStr.split('');
+        const maxLength = Math.max(oldChars.length, newChars.length);
+
+        const paddedOld = oldValStr.padStart(maxLength, ' ');
+        const paddedNew = newValStr.padStart(maxLength, ' ');
+
+        for (let i = 0; i < maxLength; i++) {
+            const oldChar = paddedOld[i];
+            const newChar = paddedNew[i];
+
+            if (oldChar === ' ' && newChar === ' ') continue;
+
+            if (oldChar === newChar) {
+                element.appendChild(document.createTextNode(newChar));
+            } else {
+                const container = document.createElement('span');
+                container.className = 'digit-container';
+
+                const reel = document.createElement('span');
+                reel.className = 'digit-reel';
+
+                const digitOld = document.createElement('span');
+                digitOld.className = 'digit';
+                digitOld.textContent = oldChar;
+
+                const digitNew = document.createElement('span');
+                digitNew.className = 'digit';
+                digitNew.textContent = newChar;
+
+                if (isIncreasing) {
+                    reel.appendChild(digitNew);
+                    reel.appendChild(digitOld);
+                    reel.style.transform = 'translateY(-100%)';
+                } else {
+                    reel.appendChild(digitOld);
+                    reel.appendChild(digitNew);
+                    reel.style.transform = 'translateY(0)';
+                }
+
+                container.appendChild(reel);
+                element.appendChild(container);
+
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        if (useColorEffect) {
+                            reel.classList.add('moving');
+                        }
+                        reel.style.transform = isIncreasing ? 'translateY(0)' : 'translateY(-100%)';
+
+                        reel.addEventListener('transitionend', () => {
+                            if (container.parentNode) {
+                                container.parentNode.replaceChild(document.createTextNode(newChar), container);
+                            }
+                        }, { once: true });
+                    });
+                });
+            }
+        }
+    }
+
+            function updateBalanceWithAnimation(newTotal) {
+                // The animateValue function includes the currency symbol via formatCurrency.
+                // We call it directly on the balanceAmount element to avoid a duplicate dollar sign.
+                animateValue(balanceAmount, lastTotalValue, newTotal, true, true);
+                lastTotalValue = newTotal;
+            }
+
+        let lastKnownState = {};
+
         function renderMainUI() {
-            assetList.innerHTML = '';
             donut.innerHTML = '';
             
             const sortedAssets = [...assets].sort((a, b) => b.value_usd - a.value_usd);
@@ -796,16 +802,61 @@
             updateBalanceWithAnimation(totalValue);
 
             let cumulativePercentage = 0;
+            const enabledAssets = sortedAssets.filter(asset => asset.enabled);
 
-            const enabledAssets = sortedAssets.filter(asset => asset.enabled && asset.value_usd > 0);
-
+            // Render donut and asset list
             enabledAssets.forEach(asset => {
-                renderAssetListItem(asset);
-                const percentage = (asset.value_usd / totalValue) * 100;
-                if(percentage > 0) {
-                    createDonutSegment(asset, percentage, cumulativePercentage);
-                    cumulativePercentage += percentage;
+                // Donut segment
+                if (asset.value_usd > 0) {
+                    const percentage = (asset.value_usd / totalValue) * 100;
+                    if(percentage > 0) {
+                        createDonutSegment(asset, percentage, cumulativePercentage);
+                        cumulativePercentage += percentage;
+                    }
                 }
+
+                // Asset list item
+                const existingElement = assetList.querySelector(`.asset-item[data-symbol='${asset.symbol}']`);
+                if (existingElement) {
+                    // Update existing element with animation
+                    const valueUsdElement = existingElement.querySelector('.asset-value-usd-value');
+                    const valueCryptoElement = existingElement.querySelector('.asset-value-crypto');
+                    const priceValueElement = existingElement.querySelector('.asset-price-value');
+                    const priceChangeElement = existingElement.querySelector('.asset-price-change');
+
+                    const lastState = lastKnownState[asset.symbol] || asset;
+
+                    // Animate USD value
+                    animateValue(valueUsdElement, lastState.value_usd, asset.value_usd, true, false);
+
+                    // Animate Price value
+                    animateValue(priceValueElement, lastState.price, asset.price, true, false);
+                    
+                    // Just update crypto and price change text for now
+                    valueCryptoElement.textContent = `${(asset.value_crypto || 0).toLocaleString(undefined, {maximumFractionDigits: 8})} ${asset.symbol}`;
+                    const changeValue = asset.change || 0;
+                    const isPositive = changeValue > 0;
+                    const changeColor = isPositive ? 'var(--accent-green)' : 'var(--text-muted)';
+                    const changeSign = isPositive ? '+' : '';
+                    priceChangeElement.style.color = changeColor;
+                    priceChangeElement.textContent = `${changeSign}${changeValue.toFixed(2)}%`;
+
+                } else {
+                    renderAssetListItem(asset); // Create new element if it doesn't exist
+                }
+            });
+
+            // Remove assets that are no longer enabled
+            const enabledSymbols = new Set(enabledAssets.map(a => a.symbol));
+            Array.from(assetList.children).forEach(item => {
+                if (!enabledSymbols.has(item.dataset.symbol)) {
+                    item.remove();
+                }
+            });
+
+            // Update last known state
+            assets.forEach(asset => {
+                lastKnownState[asset.symbol] = { ...asset };
             });
         }
 
@@ -832,6 +883,7 @@
         function renderAssetListItem(asset) {
             const item = document.createElement('div');
             item.classList.add('asset-item');
+            item.dataset.symbol = asset.symbol; // Add symbol for tracking
 
             const iconContainer = document.createElement('div');
             iconContainer.classList.add('asset-icon-container');
@@ -856,12 +908,12 @@
 
             item.innerHTML = `
                 <div class="asset-info">
-                    <div class="asset-name">${asset.name}</div>
-                    <div class="asset-price">$${(asset.price || 0).toLocaleString()} <span style="color: ${changeColor}">${changeSign}${changeValue.toFixed(2)}%</span></div>
-                </div>
+                        <div class="asset-name">${asset.name}</div>
+                        <div class="asset-price"><span class="asset-price-value">${formatCurrency(asset.price)}</span> <span class="asset-price-change" style="color: ${changeColor}">${changeSign}${changeValue.toFixed(2)}%</span></div>
+                    </div>
                 <div class="asset-balance">
                     <div class="asset-value-crypto" style="color: ${asset.color}">${(asset.value_crypto || 0).toLocaleString(undefined, {maximumFractionDigits: 8})} ${asset.symbol}</div>
-                    <div class="asset-value-usd">$${(asset.value_usd || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+                    <div class="asset-value-usd"><span class="asset-value-usd-value">${formatCurrency(asset.value_usd)}</span></div>
                 </div>
             `;
 
