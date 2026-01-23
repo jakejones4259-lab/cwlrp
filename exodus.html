@@ -451,23 +451,10 @@
         <div class="pull-indicator"></div>
         <header class="app-header">
             <div class="header-left">
-                <svg class="icon-btn" width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M14 0.5C12.5948 0.5 11.2038 0.869988 9.94439 1.5799C8.68497 2.28981 7.59171 3.3193 6.76822 4.57569C5.94472 5.83208 5.41891 7.2761 5.24373 8.7833C5.06855 10.2905 5.25013 11.8178 5.77367 13.2222L5.77378 13.2225L13.2225 5.77378C11.8181 5.25025 10.2908 5.06866 8.78358 5.24385C7.27636 5.41903 5.83236 5.94483 4.57595 6.76831C3.31954 7.59179 2.28999 8.68504 1.58005 9.94445C0.870112 11.2039 0.5 12.5948 0.5 14C0.5 16.0168 1.13661 17.9883 2.2983 19.6168L2.29841 19.617L19.617 2.29841C17.9885 1.13672 16.017 0.5 14 0.5Z" fill="#F05A28"/>
-                    <path d="M22.2262 14.7775L14.7775 22.2262C16.1819 22.7498 17.7092 22.9313 19.2164 22.7562C20.7236 22.581 22.1676 22.0552 23.424 21.2317C24.6804 20.4082 25.71 19.315 26.42 18.0555C27.1299 16.7961 27.5 15.4052 27.5 14C27.5 11.9832 26.8634 10.0117 25.7017 8.38321L25.7016 8.38309L8.38298 25.7016C10.0115 26.8633 11.983 27.5 14 27.5C15.4052 27.5 16.7962 27.13 18.0556 26.4201C19.315 25.7102 20.4083 24.6807 21.2318 23.4243C22.0553 22.1679 22.5811 20.7239 22.7563 19.2167C22.9314 17.7095 22.7499 16.1822 22.2263 14.7778L22.2262 14.7775Z" fill="#F05A28"/>
-                </svg>
+                <img src="topleft.png" style="height: 50px; cursor: pointer;">
             </div>
             <div class="header-right">
-                <button class="icon-btn">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                </button>
-                <button class="icon-btn">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                    </svg>
-                </button>
+                <img src="buttons.png" style="height: 50px; cursor: pointer;">
             </div>
         </header>
 
@@ -707,7 +694,6 @@
 
                 // Debounce this in a real app, but for now, update on every input
                 renderMainUI();
-                renderSettings();
             }
         });
 
