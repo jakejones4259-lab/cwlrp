@@ -31,7 +31,7 @@
         body {
             margin: 0;
             font-family: 'Inter', sans-serif;
-            background-color: #000;
+            background-color: #151726;
             color: var(--text-main);
             overscroll-behavior-y: none;
             height: 100vh;
@@ -46,80 +46,89 @@
             height: 100%;
             background-color: #0d0e15;
             z-index: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 60px;
-            box-sizing: border-box;
-            overflow-y: auto;
         }
-        .settings-container {
-            width: 100%;
-            padding: 20px;
-            padding-bottom: 200px; /* Added extra padding for scrolling */
-            box-sizing: border-box;
-        }
-        .settings-container h2 {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            text-align: center;
-            color: var(--text-main);
-        }
-        .status-bar {
-            position: absolute;
+        
+        #settings-overlay {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            height: 44px; /* Standard iOS status bar height */
+            height: 100%;
+            background-color: #0d0e15;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        #settings-overlay.active {
+            transform: translateY(0);
+        }
+
+        .settings-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        .settings-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 20px;
+            width: 100%;
+            padding: 20px;
+            padding-top: calc(env(safe-area-inset-top, 20px) + 10px);
             box-sizing: border-box;
-            z-index: 20;
-            color: #ffffff;
-            font-weight: 600;
-            font-size: 15px;
+            background-color: #0d0e15; /* Match overlay background */
+            z-index: 1;
+            flex-shrink: 0; /* Prevent header from shrinking */
         }
-        .status-right {
-            display: flex;
-            gap: 6px;
-            align-items: center;
+
+        #settings-asset-list {
+            flex-grow: 1; /* Allow list to take remaining space */
+            overflow-y: auto; /* Enable scrolling for the list */
+            padding: 0 20px 20px 20px; /* Add padding */
+            box-sizing: border-box;
         }
+        .close-settings-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+        }
+        .close-settings-btn svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--text-main);
+            stroke-width: 2;
+        }
+
         #app-container {
             width: 100%;
             height: calc(100% - 50px); /* Leave space at top */
-            margin-top: 50px; /* Push down to reveal status bar */
+            margin-top: 50px; /* Push down to reveal background */
             display: flex;
             flex-direction: column;
             position: relative;
             background: linear-gradient(180deg, #2F3253 0%, #202136 100%);
             border-top-left-radius: 50px;
             border-top-right-radius: 50px;
-            border-bottom-left-radius: 0; /* Full width at bottom usually */
+            border-bottom-left-radius: 0;
             border-bottom-right-radius: 0;
             overflow: hidden;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.11);
             z-index: 10;
-            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-            will-change: transform;
         }
+        
         .pull-indicator {
-            width: 36px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 2px;
-            position: absolute;
-            top: 8px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 20;
-        }
-
-        /* When dragging, disable transition for instant response */
-        #app-container.dragging {
-            transition: none;
+            width: 40px;
+            height: 5px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            margin: 10px auto 5px; /* Center horizontally, add top margin */
+            flex-shrink: 0;
         }
 
         .settings-asset-item {
@@ -249,36 +258,87 @@
             padding: 20px;
             padding-top: 0;
             height: 100%;
-            scrollbar-width: none; /* Firefox */
+            /* Custom Scrollbar for Main Page */
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
         }
         .scroll-content::-webkit-scrollbar {
-            display: none; /* Safari and Chrome */
+            width: 4px;
+            display: block; /* Force display */
         }
-        #app-container::after {
-            content: '';
+        .scroll-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .scroll-content::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+        }
+
+        #background-layer {
             position: absolute;
-            bottom: 0;
+            top: 0;
             left: 0;
-            right: 0;
-            height: 250px;
-            background: linear-gradient(180deg, rgba(25, 27, 42, 0) 0%, #202136 100%);
-            pointer-events: none;
-            z-index: 5;
-        }
-        .balance-container {
-            margin-top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0d0e15;
+            z-index: 100; /* On top of everything */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             padding-top: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            transform: translateY(100%); /* Hidden by default */
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        #background-layer.active {
+            transform: translateY(0);
+        }
+
+        .settings-container {
+            width: 100%;
+            padding: 20px;
+            padding-bottom: 100px;
+            box-sizing: border-box;
+            /* Hide scrollbar for settings */
+            scrollbar-width: none; 
+        }
+        .settings-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .close-settings-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+        }
+        .close-settings-btn svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--text-main);
+            stroke-width: 2;
+        }
+        .balance-circle {
             position: relative;
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 1;
-        }
-        .balance-circle {
-            position: relative;
+            width: 275px; /* Match SVG width */
+            height: 275px; /* Match SVG height */
+            margin: 0 auto; /* Center the container itself */
         }
         .donut {
             transform: rotate(-90deg);
+            /* Ensure SVG doesn't overflow or misalign */
+            display: block; 
         }
         .balance-amount {
             position: absolute;
@@ -453,16 +513,20 @@
 </head>
 <body>
     <div id="device-frame">
-        <div class="status-bar">
-            <div class="status-left">9:41</div>
-            <div class="status-right">
-                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="10.67" viewBox="0 0 17 10.67" fill="none"><path d="M1.33333 4V2.66667C1.33333 1.93333 1.93333 1.33333 2.66667 1.33333H14.3333C15.0667 1.33333 15.6667 1.93333 15.6667 2.66667V8C15.6667 8.73333 15.0667 9.33333 14.3333 9.33333H11.3333" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M12 1.33333L12 9.33333" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M1.33333 6.66667H8V9.33333H1.33333V6.66667Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                <svg xmlns="http://www.w3.org/2000/svg" width="15.33" height="10.67" viewBox="0 0 15.33 10.67" fill="none"><path d="M14 1.33333C14 0.966667 14 0.783333 13.9333 0.64C13.8 0.346667 13.5833 0.133333 13.2833 0.0666667C13.14 0 12.9533 0 12.5833 0H2.75C2.38 0 2.19667 0 2.05333 0.0666667C1.75333 0.133333 1.53667 0.346667 1.40333 0.64C1.33667 0.783333 1.33667 0.966667 1.33667 1.33333V9.33333C1.33667 9.7 1.33667 9.88333 1.40333 10.0267C1.53667 10.32 1.75333 10.5333 2.05333 10.6C2.19667 10.6667 2.38 10.6667 2.75 10.6667H12.5833C12.9533 10.6667 13.14 10.6667 13.2833 10.6C13.5833 10.5333 13.8 10.32 13.9333 10.0267C14 9.88333 14 9.7 14 9.33333V1.33333Z" stroke="white" stroke-width="1.5"></path><path d="M15.3333 3.33333V7.33333" stroke="white" stroke-width="1.5" stroke-linecap="round"></path></svg>
-            </div>
-        </div>
     <div id="background-layer">
+        <!-- Empty background layer as requested -->
+    </div>
+    
+    <div id="settings-overlay">
         <div class="settings-container">
-            <h2>Portfolio</h2>
+            <div class="settings-header">
+                <h2>Portfolio</h2>
+                <button class="close-settings-btn" id="close-settings">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
             <div id="settings-asset-list"></div>
         </div>
     </div>
@@ -470,10 +534,10 @@
         <div class="pull-indicator"></div>
         <header class="app-header">
             <div class="header-left">
-                <img src="topleft.png" style="height: 50px; cursor: pointer;">
+                <img src="topleft.png" style="height: 65px; cursor: pointer;">
             </div>
             <div class="header-right">
-                <img src="buttons.png" style="height: 50px; cursor: pointer;">
+                <img src="buttons.png" style="height: 65px; cursor: pointer;">
             </div>
         </header>
 
@@ -481,7 +545,7 @@
             <div class="scroll-content">
                 <div class="balance-container">
                     <div class="balance-circle">
-                        <svg class="donut" width="300" height="300" viewBox="0 0 100 100">
+                        <svg class="donut" width="275" height="275" viewBox="0 0 100 100">
                             <!-- Background ring removed as requested -->
                         </svg>
                         <div class="balance-amount" id="balance-amount">
@@ -513,7 +577,9 @@
             const balanceAmount = document.querySelector('.balance-amount');
             const settingsAssetList = document.getElementById('settings-asset-list');
             const appContainer = document.getElementById('app-container');
-            const backgroundLayer = document.getElementById('background-layer');
+            const settingsOverlay = document.getElementById('settings-overlay');
+            const openSettingsBtn = document.querySelector('.header-left img'); // More specific selector
+            const closeSettingsBtn = document.getElementById('close-settings');
 
             let lastTotalValue = 0;
 
@@ -811,26 +877,56 @@
 
         let lastKnownState = {};
 
-        function renderMainUI() {
+        function createDonutSegment(percent, color, offset, circumference, gapLength) {
+                if (percent <= 0) return null;
+                const arcLength = (percent / 100) * circumference;
+                const visibleArcLength = arcLength - gapLength;
+                if (visibleArcLength <= 0) return null;
+
+                const strokeDasharray = `${visibleArcLength} ${circumference - visibleArcLength}`;
+                const strokeDashoffset = -(offset / 100 * circumference) - (gapLength / 2);
+
+                const segment = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                segment.setAttribute("cx", "50");
+                segment.setAttribute("cy", "50");
+                segment.setAttribute("r", "45");
+                segment.setAttribute("fill", "transparent");
+                segment.setAttribute("stroke", color);
+                segment.setAttribute("stroke-width", "1.5");
+                segment.setAttribute("stroke-dasharray", strokeDasharray);
+                segment.setAttribute("stroke-dashoffset", strokeDashoffset);
+                return segment;
+            }
+
+            function renderMainUI() {
             donut.innerHTML = '';
             
             const sortedAssets = [...assets].sort((a, b) => b.value_usd - a.value_usd);
-            const totalValue = assets.reduce((acc, asset) => acc + (asset.enabled ? (asset.value_usd || 0) : 0), 0);
+            const enabledAssets = sortedAssets.filter(asset => asset.enabled);
+            const totalValue = enabledAssets.reduce((sum, asset) => sum + (asset.value_usd || 0), 0);
             updateBalanceWithAnimation(totalValue);
 
+            // --- Donut Chart Rendering ---
+            const circumference = 2 * Math.PI * 45; // r = 45
+            const gapLength = 2; // The length of the gap in SVG units
             let cumulativePercentage = 0;
-            const enabledAssets = sortedAssets.filter(asset => asset.enabled);
 
-            // Render donut and asset list
-            enabledAssets.forEach(asset => {
-                // Donut segment
-                if (asset.value_usd > 0) {
-                    const percentage = (asset.value_usd / totalValue) * 100;
-                    if(percentage > 0) {
-                        createDonutSegment(asset, percentage, cumulativePercentage);
-                        cumulativePercentage += percentage;
+            if (totalValue > 0) {
+                enabledAssets.forEach(asset => {
+                    const percent = (asset.value_usd / totalValue) * 100;
+                    if (percent > 0) {
+                        const segment = createDonutSegment(percent, asset.color, cumulativePercentage, circumference, gapLength);
+                        if (segment) {
+                            donut.appendChild(segment);
+                        }
+                        cumulativePercentage += percent;
                     }
-                }
+                });
+            }
+
+            // Render asset list
+            assetList.innerHTML = '';
+            enabledAssets.forEach(asset => {
 
                 // Asset list item
                 const existingElement = assetList.querySelector(`.asset-item[data-symbol='${asset.symbol}']`);
@@ -877,30 +973,7 @@
             });
         }
 
-        function createDonutSegment(asset, percentage, startPercentage) {
-            if (percentage <= 0) return;
 
-            const circumference = 282.743338823;
-            const gapLength = 1; // Gap between segments
-
-            // Calculate dashoffset
-            // We add the gapLength to the offset to shorten the visible stroke, creating a gap at the end
-            let dashoffset = circumference * (1 - percentage / 100) + gapLength;
-
-            const segment = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-            segment.setAttribute("class", "donut-segment");
-            segment.setAttribute("cx", "50");
-            segment.setAttribute("cy", "50");
-            segment.setAttribute("r", "45");
-            segment.setAttribute("fill", "transparent");
-            segment.setAttribute("stroke", asset.color);
-            segment.setAttribute("stroke-width", "3");
-            segment.setAttribute("stroke-dasharray", circumference);
-            segment.setAttribute("stroke-dashoffset", dashoffset);
-            segment.setAttribute("transform", `rotate(${(startPercentage * 3.6)} 50 50)`);
-            
-            donut.appendChild(segment);
-        }
 
         function renderAssetListItem(asset) {
             const item = document.createElement('div');
@@ -916,12 +989,13 @@
             icon.classList.add('asset-icon');
             iconContainer.appendChild(icon);
 
-            if (asset.network === 'eth') {
-                const overlay = document.createElement('div');
-                overlay.classList.add('network-overlay');
-                overlay.innerHTML = `<img src="exoduscoins/ethnetwork.svg" alt="ETH Network">`;
-                iconContainer.appendChild(overlay);
-            }
+            // if (asset.network === 'eth') {
+                // const overlay = document.createElement('div');
+                // overlay.classList.add('network-overlay');
+                // overlay.innerHTML = `<img src="exoduscoins/ethnetwork.svg" alt="ETH Network">`;
+                // iconContainer.appendChild(overlay);
+            // }
+            
 
             const changeValue = asset.change || 0;
             const isPositive = changeValue > 0;
@@ -1021,147 +1095,78 @@
         fetchPrices(); // Fetch prices on load
         setInterval(fetchPrices, 60000); // And every 60 seconds
 
-        // Pull-down interaction logic
+        openSettingsBtn.addEventListener('click', () => {
+            settingsOverlay.classList.add('active');
+        });
+
+        closeSettingsBtn.addEventListener('click', () => {
+            settingsOverlay.classList.remove('active');
+        });
+
+        // --- Pull Down Interaction (Touch & Mouse) ---
         const scrollContent = document.querySelector('.scroll-content');
         let startY = 0;
-        let currentY = 0;
         let isDragging = false;
-        let isOpen = false;
-        const OPEN_POSITION = 550; // How far down it sits when open
-        const DRAG_THRESHOLD = 10; // Pixels to move before considering it a drag
-        const SNAP_THRESHOLD = 100; // Pixels to drag to trigger snap
+        let currentTranslateY = 0;
 
-        // Helper to check if we are at the top of the scrollable content
-        function isAtTop() {
-            return scrollContent.scrollTop <= 0;
-        }
-
-        function updateTransform(y) {
-            // Scale effect: 1 at 0px, 0.9 at OPEN_POSITION
-            const scale = 1 - (y / 5000); 
-            appContainer.style.transform = `translateY(${y}px) scale(${scale})`;
-        }
-
-        function snapOpen() {
-            isOpen = true;
-            currentY = OPEN_POSITION;
-            appContainer.classList.remove('dragging');
-            updateTransform(OPEN_POSITION);
-        }
-
-        function snapClosed() {
-            isOpen = false;
-            currentY = 0;
-            appContainer.classList.remove('dragging');
-            appContainer.style.transform = '';
-        }
-
-        appContainer.addEventListener('click', (e) => {
-            // If open and clicked (not dragged), close it
-            if (isOpen && !isDragging) {
-                snapClosed();
+        const startDrag = (y) => {
+            if (scrollContent.scrollTop <= 0) {
+                startY = y;
             }
-        });
+        };
 
-        appContainer.addEventListener('touchstart', (e) => {
-            // If open, we can always drag. If closed, only if at top.
-            if (!isOpen && !isAtTop()) return;
-            
-            startY = e.touches[0].clientY;
-            isDragging = false;
-            // Don't prevent default yet, might be a normal scroll
-        }, { passive: true });
-
-        // Mouse support for desktop testing
-        let isMouseDown = false;
-
-        appContainer.addEventListener('mousedown', (e) => {
-            if (!isOpen && !isAtTop()) return;
-            isMouseDown = true;
-            startY = e.clientY;
-            isDragging = false;
-            console.log('Mouse down at', startY);
-        });
-
-        appContainer.addEventListener('touchmove', (e) => {
-            if (!isOpen && !isAtTop()) return;
-            
-            const y = e.touches[0].clientY;
+        const moveDrag = (y) => {
             const deltaY = y - startY;
-            handleMove(y, deltaY, e);
-        }, { passive: false });
-
-        // Mouse move
-        window.addEventListener('mousemove', (e) => {
-            if (!isMouseDown) return;
-
-            const y = e.clientY;
-            const deltaY = y - startY;
-            
-            // console.log('Mouse move', y, deltaY);
-            
-            handleMove(y, deltaY, e);
-        });
-
-        function handleMove(y, deltaY, e) {
-            // Check for drag start
-            if (Math.abs(deltaY) > DRAG_THRESHOLD && !isDragging) {
+            if (scrollContent.scrollTop <= 0 && deltaY > 0) {
                 isDragging = true;
-                appContainer.classList.add('dragging');
-                console.log('Drag started');
-            }
-
-            if (isDragging) {
-                if (e.cancelable) e.preventDefault();
-
-                let targetY = isOpen ? OPEN_POSITION + deltaY : deltaY;
-                
-                // Resistance when pulling past limits
-                if (!isOpen && targetY < 0) targetY = targetY * 0.4; // Pulling up when closed
-                if (isOpen && targetY > OPEN_POSITION) targetY = OPEN_POSITION + (targetY - OPEN_POSITION) * 0.4; // Pulling down when open
-
-                // Apply resistance for normal pull
-                if (!isOpen && targetY > 0) targetY = targetY * 0.6;
-                
-                currentY = targetY;
-                updateTransform(currentY);
-            }
-        }
-
-        appContainer.addEventListener('touchend', () => {
-            handleEnd();
-        });
-
-        // Mouse up
-        window.addEventListener('mouseup', () => {
-            if (isMouseDown) {
-                isMouseDown = false;
-                handleEnd();
-                console.log('Mouse up');
-            }
-        });
-
-        function handleEnd() {
-            if (!isDragging) return;
-            
-            isDragging = false;
-            
-            if (!isOpen) {
-                // If closed, check if we dragged down enough to open
-                if (currentY > SNAP_THRESHOLD) {
-                    snapOpen();
-                } else {
-                    snapClosed();
-                }
+                currentTranslateY = deltaY * 0.4;
+                if (currentTranslateY > 200) currentTranslateY = 200 + (currentTranslateY - 200) * 0.1;
+                appContainer.style.transform = `translateY(${currentTranslateY}px)`;
             } else {
-                // If open, check if we dragged up enough to close
-                if (currentY < OPEN_POSITION - SNAP_THRESHOLD) {
-                    snapClosed();
-                } else {
-                    snapOpen();
-                }
+                isDragging = false;
+                appContainer.style.transform = '';
             }
-        }
+        };
+
+        const endDrag = () => {
+            if (isDragging) {
+                isDragging = false;
+                appContainer.style.transition = 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)';
+                appContainer.style.transform = '';
+                setTimeout(() => {
+                    appContainer.style.transition = '';
+                }, 300);
+            }
+        };
+
+        // Touch Events
+        appContainer.addEventListener('touchstart', (e) => startDrag(e.touches[0].clientY), { passive: true });
+        appContainer.addEventListener('touchmove', (e) => moveDrag(e.touches[0].clientY), { passive: true });
+        appContainer.addEventListener('touchend', endDrag);
+
+        // Mouse Events (for desktop testing)
+        appContainer.addEventListener('mousedown', (e) => {
+            startDrag(e.clientY);
+            // Add move/up listeners to document to handle dragging outside container
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+        });
+
+        const onMouseMove = (e) => {
+            // Only move if we started a valid drag (checked in startDrag, but we need to check logic here too)
+            // Actually, startDrag just sets startY. We need to check if we should be dragging.
+            // If we are dragging, prevent default selection
+            if (startY !== 0) { // Simple check, could be more robust
+                 moveDrag(e.clientY);
+            }
+        };
+
+        const onMouseUp = () => {
+            endDrag();
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+            startY = 0; // Reset
+        };
     });
     </script>
     </div>
