@@ -226,8 +226,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px;
-            padding-top: calc(env(safe-area-inset-top, 20px) + 20px);
             z-index: 5;
         }
         .header-left, .header-right {
@@ -457,6 +455,7 @@
         .asset-price {
             color: var(--text-muted);
             font-size: 13px;
+            font-weight: 500;
         }
         .asset-balance {
             display: flex;
@@ -466,6 +465,7 @@
         }
         .asset-value-crypto {
             font-weight: 500;
+            padding-bottom: 2px;
             font-size: 16px;
         }
         .asset-value-usd {
@@ -496,7 +496,7 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 180px;
+            height: 250px;
             background: linear-gradient(to top, #202136 10%, rgba(19, 20, 31, 0) 100%);
             z-index: 15;
             pointer-events: none;
@@ -545,7 +545,7 @@
             <div class="scroll-content">
                 <div class="balance-container">
                     <div class="balance-circle">
-                        <svg class="donut" width="275" height="275" viewBox="0 0 100 100">
+                        <svg class="donut" width="220" height="220" viewBox="0 0 100 100">
                             <!-- Background ring removed as requested -->
                         </svg>
                         <div class="balance-amount" id="balance-amount">
@@ -580,6 +580,9 @@
             const settingsOverlay = document.getElementById('settings-overlay');
             const openSettingsBtn = document.querySelector('.header-left img'); // More specific selector
             const closeSettingsBtn = document.getElementById('close-settings');
+            const scrollContainer = document.getElementById('scroll-container');
+            const bottomNav = document.querySelector('.bottom-nav');
+            const bottomFade = document.querySelector('.bottom-fade');
 
             let lastTotalValue = 0;
 
@@ -591,6 +594,31 @@
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
                 }).format(value || 0);
+            };
+
+            const adjustBalanceFontSize = (element, value) => {
+                if (!element) return;
+                const formattedValue = formatCurrency(value);
+                const textLength = formattedValue.length;
+
+                let newSize = 32; // Max font size
+                const minSize = 18; // Min font size
+
+                // Start shrinking after a certain length
+                if (textLength > 12) { // e.g., "$1,000,000.00"
+                    newSize = 28;
+                }
+                if (textLength > 15) { // e.g., "$100,000,000.00"
+                    newSize = 24;
+                }
+                if (textLength > 18) {
+                    newSize = 20;
+                }
+                 if (textLength > 21) {
+                    newSize = minSize;
+                }
+
+                element.style.fontSize = `${newSize}px`;
             };
 
 
@@ -904,6 +932,7 @@
             const sortedAssets = [...assets].sort((a, b) => b.value_usd - a.value_usd);
             const enabledAssets = sortedAssets.filter(asset => asset.enabled);
             const totalValue = enabledAssets.reduce((sum, asset) => sum + (asset.value_usd || 0), 0);
+            adjustBalanceFontSize(balanceAmount, totalValue);
             updateBalanceWithAnimation(totalValue);
 
             // --- Donut Chart Rendering ---
@@ -1105,6 +1134,15 @@
 
         // --- Pull Down Interaction (Touch & Mouse) ---
         const scrollContent = document.querySelector('.scroll-content');
+
+        scrollContent.addEventListener('scroll', () => {
+            const scrollY = scrollContent.scrollTop;
+            const scrollFraction = Math.min(1, scrollY / 200); // Adjust 200 to control fade speed
+
+            bottomNav.style.transform = `translate(-50%, ${scrollFraction * 150}px)`; // Move down 150px
+            bottomFade.style.transform = `translateY(${scrollFraction * 150}px)`;
+        });
+
         let startY = 0;
         let isDragging = false;
         let currentTranslateY = 0;
