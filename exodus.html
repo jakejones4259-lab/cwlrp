@@ -146,7 +146,7 @@
         .pull-indicator {
             width: 70px;
             height: 5px;
-            background-color: rgba(255, 255, 255, 0.2);
+            background-color: #828598;
             border-radius: 3px;
             margin: 10px auto 5px; /* Center horizontally, add top margin */
             flex-shrink: 0;
@@ -250,6 +250,8 @@
             justify-content: space-between;
             align-items: center;
             z-index: 5;
+            margin: 0 -35px;
+            padding: 0 15px;
         }
         .header-left, .header-right {
             display: flex;
@@ -532,6 +534,27 @@
             border-radius: 10px;
             cursor: pointer;
         }
+
+        .add-more-container {
+            display: flex;
+            justify-content: center;
+            margin-top: -80px;
+        }
+
+        .add-more-btn {
+            background: #2c2e459e;
+            border: none;
+            border-radius: 30px;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            padding: 20px 40px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            width: auto;
+            min-width: 100px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -580,6 +603,9 @@
 
                 <div class="asset-list">
                     <!-- Asset items will be injected here -->
+                </div>
+                <div class="add-more-container">
+                    <button class="add-more-btn">Add More</button>
                 </div>
             </div>
         </main>
