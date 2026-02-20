@@ -207,8 +207,8 @@
         }
 
         .balance-eye-img {
-            width: 16px;
-            height: 16px;
+            width: 25px;
+            height: 25px;
             object-fit: contain;
         }
 
@@ -226,7 +226,7 @@
 
         .today-change {
             font-size: 14px;
-            color: var(--text-secondary);
+            color: #9391A6;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -422,10 +422,6 @@
             font-size: 13px;
         }
 
-        .coin-price {
-            color: var(--text-secondary);
-        }
-
         .coin-change {
             font-size: 12px;
         }
@@ -449,7 +445,6 @@
         }
 
         .coin-balance-usd {
-            color: var(--text-secondary);
             font-size: 12px;
         }
 
@@ -1191,10 +1186,10 @@
 
     // Coin Data and Logic
     let coinData = [
-        { id: 'tether', symbol: 'USDT', name: 'USDT', network: 'TRC20', amount: 80218.601, icon: 'TRX.webp', networkBadge: 'TRX.webp', visible: true, cgId: 'tether' },
+        { id: 'tether', symbol: 'USDT', name: 'USDT', network: 'TRC20', amount: 80218.601, icon: 'USDT.webp', networkBadge: 'TRX.webp', visible: true, cgId: 'tether' },
         { id: 'solana', symbol: 'SOL', name: 'SOL', network: 'Solana', amount: 0.0014476, icon: 'SOL.webp', visible: true, cgId: 'solana' },
         { id: 'tron', symbol: 'TRX', name: 'TRX', network: '', amount: 0.001, icon: 'TRX.webp', visible: true, cgId: 'tron' },
-        { id: 'bittorrent', symbol: 'BTT', name: 'BTT', network: 'TRC10', amount: 11, icon: 'TRX.webp', networkBadge: 'TRX.webp', visible: true, cgId: 'bittorrent' },
+        { id: 'bittorrent', symbol: 'BTT', name: 'BTT', network: 'TRC10', amount: 11, icon: 'BTT.webp', networkBadge: 'TRX.webp', visible: true, cgId: 'bittorrent' },
         { id: 'strx', symbol: 'sTRX', name: 'sTRX', network: 'TRC20', amount: 0.0000002, icon: 'TRX.webp', networkBadge: 'TRX.webp', visible: true, cgId: 'tron' },
         { id: 'bitcoin', symbol: 'BTC', name: 'BTC', network: 'Bitcoin', amount: 1.1843, icon: 'BTC.webp', visible: true, cgId: 'bitcoin' },
         { id: 'ethereum', symbol: 'ETH', name: 'ETH', network: 'Ethereum', amount: 0, icon: 'ETH.webp', visible: true, cgId: 'ethereum' },
@@ -1306,7 +1301,7 @@
         const totalChangePercent = totalUsd > 0 ? (totalChangeUsd / (totalUsd - totalChangeUsd)) * 100 : 0;
 
         document.querySelector('.main-balance').textContent = `$${totalUsd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        document.querySelector('.btc-balance').textContent = `${totalBtc.toFixed(8)} BTC`;
+        document.querySelector('.btc-balance').textContent = `${totalBtc.toFixed(4)} BTC`;
         
         const changeDetailsEl = document.querySelector('.change-details');
         const sign = totalChangeUsd >= 0 ? '+' : '';
@@ -1318,7 +1313,7 @@
 
     function formatPrice(price) {
         if (price === 0) return '0.00';
-        if (price < 0.0001) return price.toFixed(8);
+        if (price < 0.0001) return price.toFixed(4);
         if (price < 1) return price.toFixed(4);
         return price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
