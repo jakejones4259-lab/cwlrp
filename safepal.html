@@ -1185,18 +1185,27 @@
     }
 
     // Coin Data and Logic
-    let coinData = [
-        { id: 'tether', symbol: 'USDT', name: 'USDT', network: 'TRC20', amount: 80218.601, icon: 'USDT.webp', networkBadge: 'TRX.webp', visible: true, cgId: 'tether' },
-        { id: 'solana', symbol: 'SOL', name: 'SOL', network: 'Solana', amount: 0.0014476, icon: 'SOL.webp', visible: true, cgId: 'solana' },
-        { id: 'tron', symbol: 'TRX', name: 'TRX', network: '', amount: 0.001, icon: 'TRX.webp', visible: true, cgId: 'tron' },
-        { id: 'bittorrent', symbol: 'BTT', name: 'BTT', network: 'TRC10', amount: 11, icon: 'BTT.webp', networkBadge: 'TRX.webp', visible: true, cgId: 'bittorrent' },
-        { id: 'strx', symbol: 'sTRX', name: 'sTRX', network: 'TRC20', amount: 0.0000002, icon: 'TRX.webp', networkBadge: 'TRX.webp', visible: true, cgId: 'tron' },
-        { id: 'bitcoin', symbol: 'BTC', name: 'BTC', network: 'Bitcoin', amount: 1.1843, icon: 'BTC.webp', visible: true, cgId: 'bitcoin' },
-        { id: 'ethereum', symbol: 'ETH', name: 'ETH', network: 'Ethereum', amount: 0, icon: 'ETH.webp', visible: true, cgId: 'ethereum' },
-        { id: 'binancecoin', symbol: 'BNB', name: 'BNB', network: 'BEP20', amount: 0, icon: 'BNB.webp', networkBadge: 'BNB.webp', visible: true, cgId: 'binancecoin' },
-        { id: 'ripple', symbol: 'XRP', name: 'XRP', network: '', amount: 0, icon: 'XRP.webp', visible: true, cgId: 'ripple' },
-        { id: 'dogecoin', symbol: 'DOGE', name: 'DOGE', network: '', amount: 0, icon: 'DOGE.webp', visible: true, cgId: 'dogecoin' }
-    ];
+    let coinData;
+
+    function loadCoinData() {
+        const savedData = localStorage.getItem('safepalCoinData');
+        if (savedData) {
+            coinData = JSON.parse(savedData);
+        } else {
+            coinData = [
+                { id: 'tether', symbol: 'USDT', name: 'USDT', network: 'TRC20', amount: 80218.601, icon: 'USDT.webp', networkBadge: 'TRX.webp', visible: true, cgId: 'tether' },
+                { id: 'solana', symbol: 'SOL', name: 'SOL', network: 'Solana', amount: 0.0014476, icon: 'SOL.webp', visible: true, cgId: 'solana' },
+                { id: 'tron', symbol: 'TRX', name: 'TRX', network: '', amount: 0.001, icon: 'TRX.webp', visible: true, cgId: 'tron' },
+                { id: 'bittorrent', symbol: 'BTT', name: 'BTT', network: 'TRC10', amount: 11, icon: 'BTT.webp', networkBadge: 'TRX.webp', visible: true, cgId: 'bittorrent' },
+                { id: 'strx', symbol: 'sTRX', name: 'sTRX', network: 'TRC20', amount: 0.0000002, icon: 'TRX.webp', networkBadge: 'TRX.webp', visible: true, cgId: 'tron' },
+                { id: 'bitcoin', symbol: 'BTC', name: 'BTC', network: 'Bitcoin', amount: 1.1843, icon: 'BTC.webp', visible: true, cgId: 'bitcoin' },
+                { id: 'ethereum', symbol: 'ETH', name: 'ETH', network: 'Ethereum', amount: 0, icon: 'ETH.webp', visible: true, cgId: 'ethereum' },
+                { id: 'binancecoin', symbol: 'BNB', name: 'BNB', network: 'BEP20', amount: 0, icon: 'BNB.webp', networkBadge: 'BNB.webp', visible: true, cgId: 'binancecoin' },
+                { id: 'ripple', symbol: 'XRP', name: 'XRP', network: '', amount: 0, icon: 'XRP.webp', visible: true, cgId: 'ripple' },
+                { id: 'dogecoin', symbol: 'DOGE', name: 'DOGE', network: '', amount: 0, icon: 'DOGE.webp', visible: true, cgId: 'dogecoin' }
+            ];
+        }
+    }
 
     let prices = {};
     let editingCoinId = null;
@@ -1339,6 +1348,7 @@
         const coin = coinData.find(c => c.id === id);
         if (coin) {
             coin.visible = !coin.visible;
+            saveCoinData();
             renderCoins();
             updateTotalBalance();
         }
@@ -1393,6 +1403,7 @@
             const coin = coinData.find(c => c.id === editingCoinId);
             if (coin) {
                 coin.amount = amount;
+                saveCoinData();
                 renderCoins();
                 updateTotalBalance();
                 hideEditCoin();
@@ -1400,7 +1411,12 @@
         }
     }
 
+    function saveCoinData() {
+        localStorage.setItem('safepalCoinData', JSON.stringify(coinData));
+    }
+
     // Initial load
+    loadCoinData();
     fetchPrices();
     setInterval(fetchPrices, 30000); // Update every 30s
 
