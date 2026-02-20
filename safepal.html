@@ -94,7 +94,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 1px;
             color: var(--text-secondary);
             font-size: 10px;
             flex: 1;
@@ -105,8 +105,8 @@
         }
 
         .nav-item-img {
-            width: 24px;
-            height: 24px;
+            width: 40px;
+            height: 40px;
             object-fit: contain;
             margin-bottom: 4px;
         }
@@ -143,6 +143,7 @@
             font-size: 18px;
             font-weight: 100;
             color: white;
+            margin-right: 20px;
         }
 
         .wallet-selector i {
@@ -228,14 +229,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 3px;
+            gap: 5px;
         }
 
-        .today-change.negative {
+        .change-details.negative {
             color: var(--accent-red);
         }
 
-        .today-change.positive {
+        .change-details.positive {
             color: var(--accent-green);
         }
 
@@ -403,11 +404,11 @@
         .coin-symbol {
             font-weight: 100;
             font-size: 16px;
-            color: white;
+            color: #FFFFFF;
         }
 
         .coin-network-inline {
-            color: var(--text-secondary);
+            color: #CAC9D7;
             font-size: 16px;
             font-weight: 400;
             margin-left: 2px;
@@ -836,8 +837,9 @@
                 </div>
                 <div class="main-balance">$80,178.6</div>
                 <div class="btc-balance">1.1843 BTC</div>
-                <div class="today-change negative">
-                    Today $-0 <i class="fas fa-caret-down"></i> -0.01%
+                <div class="today-change">
+                    <span>Today</span>
+                    <span class="change-details"></span>
                 </div>
             </div>
 
@@ -1278,12 +1280,12 @@
         document.querySelector('.main-balance').textContent = `$${totalUsd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
         document.querySelector('.btc-balance').textContent = `${totalBtc.toFixed(8)} BTC`;
         
-        const changeEl = document.querySelector('.today-change');
+        const changeDetailsEl = document.querySelector('.change-details');
         const sign = totalChangeUsd >= 0 ? '+' : '';
         const icon = totalChangeUsd >= 0 ? 'fa-caret-up' : 'fa-caret-down';
         
-        changeEl.className = `today-change`;
-        changeEl.innerHTML = `Today ${sign}$${Math.abs(totalChangeUsd).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <i class="fas ${icon}"></i> ${sign}${totalChangePercent.toFixed(2)}%`;
+        changeDetailsEl.className = `change-details ${totalChangeUsd >= 0 ? 'positive' : 'negative'}`;
+        changeDetailsEl.innerHTML = `${sign}$${Math.abs(totalChangeUsd).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <i class="fas ${icon}"></i> ${sign}${totalChangePercent.toFixed(2)}%`;
     }
 
     function formatPrice(price) {
